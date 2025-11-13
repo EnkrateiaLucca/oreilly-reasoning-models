@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Ping Pong Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            overflow: hidden;
+            perspective: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 90vw;
+            max-width: 1000px;
+            height: 80vh;
+            transform-style: preserve-3d;
+        }
+
+        #gameArea {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        #table {
+            position: absolute;
+            width: 60%;
+            height: 80%;
+            background: #1a5f4d;
+            border: 8px solid #8b4513;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateX(60deg);
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #net {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 10px,
+                white 10px,
+                white 12px
+            );
+            border-top: 4px solid white;
+            border-bottom: 4px solid white;
+            top: 50%;
+            transform: translateY(-50%) translateZ(20px);
+            opacity: 0.7;
+        }
+
+        #paddle, #aiPaddle {
+            position: absolute;
+            width: 80px;
+            height: 15px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            border-radius: 50%;
+            transform: translateZ(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            transition: left 0.1s ease-out;
+        }
+
+        #paddle {
+            bottom: 5%;
+            left: 0;
+            transform: translateZ(5px);
+        }
+
+        #aiPaddle {
+            top: 5%;
+            left: 50%;
+            transform: translateZ(5px);
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        #ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #ffeb3b);
+            border-radius: 50%;
+            transform: translateZ(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 0.02s linear;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 200;
+            border-radius: 20px;
+        }
+
+        #gameOverScreen {
+            display: none;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ffeb3b;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            font-family: inherit;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        .instruction {
+            margin: 20px;
+            font-size: 16px;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        #particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: float 3s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(50px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="gameArea">
+            <div id="table">
+                <div id="net"></div>
+                <div id="paddle"></div>
+                <div id="aiPaddle"></div>
+                <div id="ball"></div>
+            </div>
+            <div id="particles"></div>
+        </div>
+
+        <div id="score">
+            <div>You: <span id="playerScore">0</span></div>
+            <div>Computer: <span id="aiScore">0</span></div>
+        </div>
+
+        <div id="startScreen">
+            <h1>🏓 3D Ping Pong 🏓</h1>
+            <p class="instruction">
+                Challenge the computer to a ping pong match!<br>
+                First to 5 points wins!<br><br>
+                <strong>Move your mouse to control the paddle!</strong>
+            </p>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="gameOverScreen">
+            <h1>🏓 Game Over 🏓</h1>
+            <p class="instruction" id="finalMessage"></p>
+            <button onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const paddle = document.getElementById('paddle');
+        const aiPaddle = document.getElementById('aiPaddle');
+        const ball = document.getElementById('ball');
+        const table = document.getElementById('table');
+        const playerScoreEl = document.getElementById('playerScore');
+        const aiScoreEl = document.getElementById('aiScore');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalMessage = document.getElementById('finalMessage');
+
+        let ballX = 50; // percentage
+        let ballY = 50;
+        let ballSpeedX = 0.5;
+        let ballSpeedY = 0.5;
+        let playerScore = 0;
+        let aiScore = 0;
+        let gameActive = false;
+        let paddleX = 50;
+
+        // Initialize paddle position
+        paddle.style.left = paddleX + '%';
+        aiPaddle.style.left = '50%';
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameActive = true;
+            resetBall();
+            gameLoop();
+        }
+
+        function resetBall() {
+            ballX = 50;
+            ballY = 50;
+            ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.3);
+            ballSpeedY = (Math.random() > 0.5 ? 1 : -1) * (0.6 + Math.random() * 0.3);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const tableRect = table.getBoundingClientRect();
+            const x = (e.clientX - tableRect.left) / tableRect.width * 100;
+            paddleX = Math.max(10, Math.min(90, x));
+            paddle.style.left = paddleX + '%';
+        });
+
+        function gameLoop() {
+            if (!gameActive) return;
+
+            // Move ball
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            // Wall collision (left and right)
+            if (ballX <= 0 || ballX >= 100) {
+                ballSpeedX = -ballSpeedX;
+                createParticles(ballX, ballY);
+            }
+
+            // AI paddle movement (with some personality - sometimes misses!)
+            const aiTarget = ballX + (Math.random() - 0.5) * 20;
+            const aiPaddleX = parseFloat(aiPaddle.style.left || 50);
+            const aiSpeed = 0.8; // AI is pretty good but not perfect
+            if (aiPaddleX < aiTarget - 2) {
+                aiPaddle.style.left = Math.min(90, aiPaddleX + aiSpeed) + '%';
+            } else if (aiPaddleX > aiTarget + 2) {
+                aiPaddle.style.left = Math.max(10, aiPaddleX - aiSpeed) + '%';
+            }
+
+            // Player paddle collision
+            if (ballY >= 85 && ballY <= 90) {
+                const paddleLeft = paddleX - 8;
+                const paddleRight = paddleX + 8;
+                if (ballX >= paddleLeft && ballX <= paddleRight) {
+                    ballSpeedY = -Math.abs(ballSpeedY);
+                    ballSpeedX += (ballX - paddleX) * 0.05; // Add spin
+                    createParticles(ballX, ballY);
+                }
+            }
+
+            // AI paddle collision
+            const aiPaddlePos = parseFloat(aiPaddle.style.left || 50);
+            if (ballY <= 15 && ballY >= 10) {
+                const aiPaddleLeft = aiPaddlePos - 8;
+                const aiPaddleRight = aiPaddlePos + 8;
+                if (ballX >= aiPaddleLeft && ballX <= aiPaddleRight) {
+                    ballSpeedY = Math.abs(ballSpeedY);
+                    ballSpeedX += (ballX - aiPaddlePos) * 0.05;
+                    createParticles(ballX, ballY);
+                }
+            }
+
+            // Scoring
+            if (ballY <= 0) {
+                playerScore++;
+                playerScoreEl.textContent = playerScore;
+                checkGameOver();
+                resetBall();
+            }
+            if (ballY >= 100) {
+                aiScore++;
+                aiScoreEl.textContent = aiScore;
+                checkGameOver();
+                resetBall();
+            }
+
+            // Update ball position
+            ball.style.left = ballX + '%';
+            ball.style.top = ballY + '%';
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function createParticles(x, y) {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                particle.style.animationDelay = (i * 0.1) + 's';
+                particlesContainer.appendChild(particle);
+                setTimeout(() => particle.remove(), 3000);
+            }
+        }
+
+        function checkGameOver() {
+            if (playerScore >= 5 || aiScore >= 5) {
+                gameActive = false;
+                const won = playerScore >= 5;
+                const messages = won ? [
+                    `Congratulations! You won ${playerScore}-${aiScore}!<br><br>Great job! Your reflexes are on point!`,
+                    `Victory! Score: ${playerScore}-${aiScore}!<br><br>You've mastered the 3D ping pong table!`,
+                    `You won ${playerScore}-${aiScore}!<br><br>Excellent play! The computer didn't stand a chance!`
+                ] : [
+                    `Nice try! Final score: ${aiScore}-${playerScore}.<br><br>The computer won this time, but you'll get 'em next round!`,
+                    `Game Over! Score: ${aiScore}-${playerScore}.<br><br>Don't give up! Practice makes perfect!`,
+                    `Computer wins ${aiScore}-${playerScore}!<br><br>That was close! Try again and beat that AI!`
+                ];
+                finalMessage.innerHTML = messages[Math.floor(Math.random() * messages.length)];
+                gameOverScreen.style.display = 'flex';
+            }
+        }
+
+        // Create some ambient particles
+        setInterval(() => {
+            if (gameActive) {
+                createParticles(Math.random() * 100, Math.random() * 100);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
