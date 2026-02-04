@@ -12,9 +12,5 @@
         "python.defaultInterpreterPath": ".venv/bin/python"
       }
     }
-  },
-  "forwardPorts": [8888],
-  "portsAttributes": {
-    "8888": { "label": "Jupyter Lab" }
   }
 }

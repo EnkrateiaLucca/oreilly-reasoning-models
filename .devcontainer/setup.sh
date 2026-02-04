@@ -12,4 +12,4 @@ uv pip install -r requirements/requirements.txt
 # Install Jupyter kernel
 uv run ipython kernel install --user --env VIRTUAL_ENV "$(pwd)/.venv" --name=oreilly-reasoning
 
-echo "Codespace ready! Run: uv run --with jupyter jupyter lab"
+echo "Codespace ready! Open any .ipynb file from the notebooks/ folder to get started."

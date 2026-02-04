@@ -6,7 +6,7 @@ This repository contains materials for the O'Reilly live training course on reas
 
 **Link**: [Working with o1, DeepSeek, and Gemini 2.5 Reasoning Capabilities](https://www.oreilly.com/live-events/working-with-o1-deepseek-and-gemini-20-reasoning-capabilities/0642572015593/)
 
-This course explores the reasoning capabilities of the latest AI models including OpenAI's GPT-5, o-series models, DeepSeek, and Google's Gemini 2.0. Learn how to effectively leverage these models' advanced reasoning abilities for your applications.
+This course explores the reasoning capabilities of OpenAI's o1, DeepSeek, and Google's Gemini 2.5 Pro. Learn how to effectively leverage these models' advanced reasoning abilities for your applications.
 
 ### Key Concepts Covered
 
@@ -92,15 +92,11 @@ If you prefer not to use GitHub secrets, you can create a local `.env` file:
 2. Open the `.env` file and replace the placeholder values with your actual API keys
 3. The `.env` file is git-ignored, so your keys won't be accidentally committed
 
-#### Step 3: Start Jupyter Lab
+#### Step 3: Open the Notebooks
 
-Once your Codespace is ready and API keys are configured, run:
+Once your Codespace is ready and API keys are configured, open any `.ipynb` file from the `notebooks/` folder in the file explorer. VS Code has built-in Jupyter support and will run the notebooks directly.
 
-```bash
-uv run --with jupyter jupyter lab
-```
-
-A notification will appear with a link to open Jupyter Lab. Click it, or go to the **Ports** tab and click the forwarded port (8888).
+When you open a notebook, VS Code may prompt you to select a kernel. Choose the **oreilly-reasoning** kernel (or the Python environment from `.venv`).
 
 ### Option 2: Local Setup
 
@@ -139,7 +135,9 @@ If you prefer to run locally instead of using GitHub Codespaces:
    # Edit .env and add your API keys
    ```
 
-5. Start Jupyter Lab:
+5. Open the notebooks in VS Code:
    ```bash
-   uv run --with jupyter jupyter lab
+   code .
    ```
+
+   Then open any `.ipynb` file from the `notebooks/` folder. VS Code has built-in Jupyter support. Select the Python interpreter from `.venv` when prompted.
