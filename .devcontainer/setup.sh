@@ -10,6 +10,14 @@ uv venv .venv
 uv pip install -r requirements/requirements.txt
 
 # Install Jupyter kernel
-uv run ipython kernel install --user --env VIRTUAL_ENV "$(pwd)/.venv" --name=oreilly-reasoning
+uv run ipython kernel install --user --env VIRTUAL_ENV "$(pwd)/.venv" --name=oreilly-reasoning --display-name="O'Reilly Reasoning Models"
 
-echo "Codespace ready! Open any .ipynb file from the notebooks/ folder to get started."
+echo ""
+echo "=============================================="
+echo "Codespace ready!"
+echo "=============================================="
+echo ""
+echo "1. Open any .ipynb file from the notebooks/ folder"
+echo "2. IMPORTANT: Select the 'O'Reilly Reasoning Models' kernel"
+echo "   (Click kernel selector in top-right corner of notebook)"
+echo ""
