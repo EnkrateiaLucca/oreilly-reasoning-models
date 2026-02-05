@@ -3,3 +3,6 @@ openai
 anthropic
 docling
 matplotlib
+pandas
+python-dotenv
+pydantic

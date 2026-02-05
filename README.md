@@ -1,12 +1,12 @@
-# O'Reilly Live Training: Working with o1, DeepSeek, and Gemini 2.5 Pro Reasoning Capabilities
+# O'Reilly Live Training: Working with OpenAI and Anthropic Reasoning Models
 
 This repository contains materials for the O'Reilly live training course on reasoning capabilities of modern LLMs.
 
 ## Course Information
 
-**Link**: [Working with o1, DeepSeek, and Gemini 2.5 Reasoning Capabilities](https://www.oreilly.com/live-events/working-with-o1-deepseek-and-gemini-20-reasoning-capabilities/0642572015593/)
+**Link**: [Working with OpenAI and Anthropic Reasoning Models](https://www.oreilly.com/live-events/working-with-o1-deepseek-and-gemini-20-reasoning-capabilities/0642572015593/)
 
-This course explores the reasoning capabilities of OpenAI's o1, DeepSeek, and Google's Gemini 2.5 Pro. Learn how to effectively leverage these models' advanced reasoning abilities for your applications.
+This course explores the reasoning capabilities of OpenAI's GPT-5.2 and Anthropic's Claude models. Learn how to effectively leverage these models' advanced reasoning abilities for your applications.
 
 ### Key Concepts Covered
 
@@ -20,27 +20,39 @@ This course explores the reasoning capabilities of OpenAI's o1, DeepSeek, and Go
 ## Repository Structure
 
 - `notebooks/`: Jupyter notebooks for hands-on exercises
-  - `gpt5-reasoning-demo.ipynb`: Comprehensive guide to OpenAI's GPT-5 reasoning models with the Responses API
-  - `introduction-to-reasoning-models.ipynb`: Introduction to reasoning model concepts
+  - `analytical-framework.ipynb`: LLM-as-a-Judge framework for evaluating model performance
+  - `openai-thinking-parameters.ipynb`: Comprehensive guide to OpenAI's GPT-5.2 with the Responses API
+  - `anthropic-extended-thinking.ipynb`: Guide to Anthropic's Claude extended thinking capabilities
   - `assets-resources/`: Additional resources and reference materials
 - `presentation/`: Slides and presentation materials
 - `project-notes.md`: Notes and resources for the live course
 
-### GPT-5 Reasoning Demo (`gpt5-reasoning-demo.ipynb`)
+### Notebook Descriptions
 
-A practical, hands-on guide to OpenAI's GPT-5 reasoning capabilities featuring:
+#### 1. Analytical Framework (`analytical-framework.ipynb`)
+A practical framework for evaluating LLM performance using LLM-as-a-Judge methodology:
+- Compare model outputs across GPT-4o, GPT-5.2, and Claude Sonnet 4.5
+- Structured evaluation with Pydantic models
+- Cost analysis with real 2026 pricing
+- PDF-to-markdown conversion for document analysis
 
-- **Reasoning Effort Levels**: Compare minimal, medium, and high reasoning efforts with real examples
-- **Verbosity Control**: Learn how to control output length independently from reasoning depth
-- **Practical Use Cases**:
-  - Simple classification with minimal reasoning
-  - Code generation with medium reasoning
-  - Complex algorithm design with high reasoning
-  - Bug detection and code review
-- **Best Practices**: Based on OpenAI's latest guidelines for optimal performance
-- **Token Usage Analysis**: See how different settings affect cost and performance
+#### 2. OpenAI Thinking Parameters (`openai-thinking-parameters.ipynb`)
+A hands-on guide to OpenAI's GPT-5.2 reasoning capabilities:
+- **Responses API**: New API designed for reasoning models
+- **Reasoning Effort Levels**: none, low, medium, high, xhigh
+- **Verbosity Control**: Independent output length control
+- **Tool Use**: Function calling and web search integration
+- **Structured Outputs**: Pydantic models for typed responses
+- **Best Practices**: Write briefs, focus on WHAT not HOW
 
-All examples are designed to run quickly and demonstrate clear, practical applications.
+#### 3. Anthropic Extended Thinking (`anthropic-extended-thinking.ipynb`)
+A comprehensive tutorial on Claude's extended thinking feature:
+- **Budget Tokens**: Control reasoning depth (1K-32K+ tokens)
+- **Streaming**: Required for large outputs, improves UX
+- **Tool Use**: Integration with tool_choice: auto
+- **Interleaved Thinking**: Beta feature for Claude 4 models
+- **Summarized Thinking**: Claude 4+ returns summaries, billed for full tokens
+- **Best Practices**: Start minimal, don't say "think step by step"
 
 ## Getting Started
 
