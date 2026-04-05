@@ -33,39 +33,43 @@ class: center, middle
 
 --
 
-2. Theory Behind Reasoning
+2. The Reasoning Model Landscape (2024–2026)
 
 --
 
-3. Reasoning Models vs Traditional LLMs
+3. Theory Behind Reasoning & Test-Time Compute
 
 --
 
-4. Why use a Reasoning LLM?
+4. Reasoning Models vs Traditional LLMs
 
 --
 
-5. When to use a Reasoning LLM?
+5. Why use a Reasoning LLM?
 
 --
 
-6. How to Use a Reasoning LLM?
+6. When to use a Reasoning LLM?
 
 --
 
-7. Limitations of Reasoning LLMs
+7. How to Use a Reasoning LLM? (APIs & Techniques)
 
 --
 
-8. Choosing a Reasoning LLM
+8. Limitations of Reasoning LLMs
 
 --
 
-9. Hands-on with Reasoning LLMs
+9. Choosing a Reasoning LLM
 
 --
 
-10. From Benchmarks to Applications
+10. Hands-on with Reasoning LLMs
+
+--
+
+11. From Benchmarks to Applications
 
 ---
 # What is a Reasoning LLM?
@@ -123,6 +127,51 @@ class: center, middle
 
 ---
 
+# The Reasoning Model Landscape (2024–2026)
+
+| Provider | Model | Release | Key Feature |
+|---|---|---|---|
+| OpenAI | o1 | Sep 2024 | First chain-of-thought reasoning model |
+| DeepSeek | R1 | Jan 2025 | Pure RL reasoning; published in *Nature* |
+| OpenAI | o3-mini | Jan 2025 | Faster reasoning; `reasoning_effort` levels |
+| Anthropic | Claude 3.7 Sonnet | Feb 2025 | Hybrid model: reasoning as togglable mode |
+| Alibaba | QwQ-32B | Mar 2025 | Open-source (Apache 2.0), 32B params |
+| Google | Gemini 2.5 Pro | Mar 2025 | `thinking_budget`, 2M context window |
+| OpenAI | o3 / o4-mini | Apr 2025 | Multimodal reasoning ("think with images") |
+| OpenAI | o3-pro | Jun 2025 | Highest-performance o-series variant |
+
+--
+
+**Key trend**: Reasoning is becoming a standard feature of all frontier models, not a separate product line.
+
+---
+
+# The Landscape: What Changed?
+
+--
+
+- **Reasoning is now infrastructure**, not a separate product
+  - Claude 4: extended thinking is a toggle, not a different model
+  - GPT-5.2: reasoning effort is just another parameter
+
+--
+
+- **Open-source caught up**: DeepSeek-R1 and QwQ-32B match or rival proprietary models
+
+--
+
+- **Multimodal reasoning**: o3 can "think with images" — crop, zoom, rotate during reasoning
+
+--
+
+- **Deprecations**: `o1-preview` and `o1-mini` deprecated April 2025, replaced by o3/o4-mini
+
+--
+
+- **Price drops**: o3 dropped 80% in price by June 2025 ($2/$8 per million tokens)
+
+---
+
 # Theory Behind Reasoning
 
 ## Why Intermediate Steps Matter
@@ -146,6 +195,42 @@ class: center, middle
 --
 
 - **Justification**: This explains why "let it think longer" improves accuracy
+
+---
+
+# The Big Paradigm Shift: Test-Time Compute Scaling
+
+--
+
+- **Old paradigm**: Scale training compute -> bigger models -> better answers
+
+--
+
+- **New paradigm**: Scale inference compute -> more thinking time -> better answers
+
+--
+
+- Three forms of test-time compute:
+
+--
+
+  1. **Internal reasoning budgets** (thinking tokens)
+
+--
+
+  2. **Parallel sampling** (best-of-N, self-consistency)
+
+--
+
+  3. **Sequential refinement** (critique -> revise loops)
+
+--
+
+- **Why it matters**: You can now dial reasoning depth *per-query*, trading cost for accuracy programmatically
+
+--
+
+- This is the single most important shift in LLM capability since scaling laws
 
 ---
 class: center, middle
@@ -336,7 +421,7 @@ class: center, middle
 --
 
 - **Complex Problem Solving**
-  
+
   - Mathematical proofs
   - Logic puzzles
   - Multi-step reasoning
@@ -344,7 +429,7 @@ class: center, middle
 --
 
 - **Deep Analysis**
-  
+
   - Research papers
   - Document analysis
   - Meeting notes interpretation
@@ -352,7 +437,7 @@ class: center, middle
 --
 
 - **Planning & Agency**
-  
+
   - Workflow planning
   - Agentic systems
   - Strategic decision-making
@@ -360,7 +445,7 @@ class: center, middle
 --
 
 - **Retrieval + Reasoning**
-  
+
   - RAG with reasoning chains
   - Evidence-based analysis
   - Multi-document synthesis
@@ -372,7 +457,7 @@ class: center, middle
 --
 
 - **Data Analysis**
-  
+
   - Medical diagnostics
   - Complex data interpretation
   - Anomaly detection
@@ -380,7 +465,7 @@ class: center, middle
 --
 
 - **Background Processing**
-  
+
   - Batch processing workflows
   - Overnight analysis jobs
 
@@ -402,6 +487,160 @@ class: center, middle
 
 ---
 
+# The Three Major APIs for Reasoning
+
+Every major provider now offers **controllable reasoning depth**:
+
+--
+
+| Provider | Parameter | Values | Default |
+|---|---|---|---|
+| **OpenAI** | `reasoning.effort` | `low`, `medium`, `high` | `medium` |
+| **Anthropic** | `thinking.budget_tokens` | 1,024 – max_tokens | — |
+| **Anthropic (4.6+)** | `thinking.effort` | like OpenAI | — |
+| **Google** | `thinking_budget` | 128 – 32,768 (or `-1`) | 8,192 |
+
+--
+
+**The convergence**: All labs are moving toward the same abstraction — a "thinking effort" dial that trades cost/latency for accuracy.
+
+---
+
+# OpenAI Responses API — Reasoning Effort
+
+```python
+from openai import OpenAI
+client = OpenAI()
+
+response = client.responses.create(
+    model="o3",
+    reasoning={"effort": "high"},  # low | medium | high
+    input=[
+        {"role": "developer", "content": "You are a math tutor."},
+        {"role": "user", "content": "Prove that sqrt(2) is irrational."}
+    ]
+)
+print(response.output_text)
+```
+
+--
+
+- `reasoning_effort`: `low`, `medium` (default), `high`
+- Reasoning tokens preserved across multi-turn calls
+- "Reasoning summaries" available for debugging (no extra cost)
+- o4-mini: $1.10/M input, $4.40/M output (~10x cheaper than original o3)
+
+---
+
+# OpenAI Responses API — GPT-5.2
+
+```python
+# GPT-5.2 also supports reasoning effort
+response = client.responses.create(
+    model="gpt-5.2",
+    reasoning={"effort": "medium"},
+    input=[
+        {"role": "developer", "content": "Analyze this code."},
+        {"role": "user", "content": code_snippet}
+    ]
+)
+```
+
+--
+
+- GPT-5.2 integrates reasoning natively — no separate "o-series" needed
+- `reasoning_effort` values: `none`, `low`, `medium`, `high`, `xhigh`
+- The Responses API is **replacing the Assistants API** as OpenAI's primary interface
+
+---
+
+# Anthropic Extended Thinking API
+
+```python
+from anthropic import Anthropic
+client = Anthropic()
+
+response = client.messages.create(
+    model="claude-sonnet-4-5-20250514",
+    max_tokens=16000,
+    thinking={
+        "type": "enabled",
+        "budget_tokens": 10000  # min 1,024
+    },
+    messages=[{"role": "user", "content": "Solve step by step..."}]
+)
+
+# Response contains both thinking and text blocks
+for block in response.content:
+    if block.type == "thinking":
+        print("Thinking:", block.thinking)
+    elif block.type == "text":
+        print("Answer:", block.text)
+```
+
+--
+
+- `budget_tokens`: How much thinking to allow (min 1,024, must be < `max_tokens`)
+- Thinking blocks are separate from text blocks in the response
+- Claude Opus 4.6 / Sonnet 4.6: Use `effort` parameter instead of `budget_tokens`
+
+---
+
+# Google Gemini 2.5 — Thinking Budget
+
+```python
+from google.generativeai import GenerativeModel
+model = GenerativeModel("gemini-2.5-pro")
+
+response = model.generate_content(
+    "What is the probability of drawing a flush in poker?",
+    generation_config={
+        "thinking_config": {"thinking_budget": 8192}
+    }
+)
+```
+
+--
+
+- `thinking_budget`: 128–32,768 tokens (default 8,192)
+- Set to `-1` for dynamic auto-scaling based on query complexity
+- Set to `0` to disable thinking entirely
+- **2M token context window** — largest among reasoning models
+
+---
+
+# Agentic Reasoning: Think -> Act -> Observe -> Think
+
+The new standard pattern for autonomous agents:
+
+--
+
+```
++----------+    +----------+    +----------+    +----------+
+|  Think   |--->|   Act    |--->| Observe  |--->|  Think   |
+|(internal)|    |(tool use)|    |(results) |    | (refine) |
++----------+    +----------+    +----------+    +----------+
+```
+
+--
+
+- **Anthropic's "Think" tool**: An explicit tool call that lets Claude pause and reason mid-task
+
+--
+
+- **Interleaved thinking** (Claude 4): Alternate between thinking blocks and tool calls
+  - Enable with beta header `interleaved-thinking-2025-05-14`
+
+--
+
+- **OpenAI o3/o4-mini**: Natively use web search, code execution, image generation within the chain of thought
+
+--
+
+- **This is the future**: Reasoning *within* a tool-use loop, not reasoning *then* acting
+
+---
+
 # Core Techniques for Reasoning LLMs
 
 ## 1. Decoding-Based Chain-of-Thought
@@ -414,7 +653,7 @@ def cot_decode(prompt, model, n_samples=5):
         answer = extract_answer(response)
         confidence = model.score_answer(response, answer)
         candidates.append((response, answer, confidence))
-    
+
     # Select by confidence, not length!
     best = max(candidates, key=lambda x: x[2])
     return best[0]  # Return full reasoning
@@ -437,7 +676,7 @@ def self_consistency(prompt, model, n_samples=10):
         response = model.generate(prompt, temp=0.5)
         answer = extract_answer(response)
         answers.append(answer)
-    
+
     # Majority voting
     from collections import Counter
     votes = Counter(answers)
@@ -461,7 +700,7 @@ def controlled_reasoning(prompt, model, thinking_tokens=500):
         "reasoning_mode": "serial",
         "intermediate_outputs": True
     }
-    
+
     response = model.generate(prompt, **config)
     return response
 ```
@@ -520,7 +759,7 @@ Now proceed with the solution...
 
 1. **Confidence-Weighted Selection**
     ```python
-    weighted_answer = max(candidates, 
+    weighted_answer = max(candidates,
                         key=lambda x: x.confidence * x.consistency)
     ```
 
@@ -563,6 +802,40 @@ class: center, middle
 <p style="font-size: 14px; margin-left: 0px">
   <a href='https://www.latent.space/p/gpt-5-review'>GPT-5 Hands-On: Welcome to the Stone Age</a>
 </p>
+
+---
+
+# Prompting Best Practices for Reasoning Models
+
+--
+
+## What's Different
+
+- **Don't over-prompt CoT**: "Think step by step" is redundant — the model handles reasoning internally
+
+--
+
+- **Be explicit about the task**: Clear problem framing matters more than CoT triggers
+
+--
+
+- **Think in briefs, not prompts**: Goal + Return Format + Constraints + Context
+
+--
+
+## Provider-Specific Tips
+
+--
+
+- **OpenAI (o3 / GPT-5.2)**: Use `developer` role for system instructions. Place context after the request.
+
+--
+
+- **Anthropic (Claude)**: Place context before the request. Use `budget_tokens` to control depth.
+
+--
+
+- **For simple tasks**: Use `reasoning_effort: "low"` or disable thinking entirely — saves cost and avoids overthinking
 
 ---
 class: center, middle
@@ -654,7 +927,7 @@ class: center, middle
 --
 
 - **Decoding-Objective Mismatch**
-  - Model's next-token distribution ≠ user goals
+  - Model's next-token distribution != user goals
   - Probabilistic outputs vs deterministic needs
   - Requires careful aggregation strategies
 
@@ -672,9 +945,56 @@ class: center, middle
 </p>
 
 ---
+
+# New Research Findings on Limitations
+
+--
+
+## Token Overhead
+- One study found reasoning models use **1,953% more tokens** than standard models for equivalent simple answers
+- For simple tasks, reasoning is pure overhead with no accuracy benefit
+
+--
+
+## Inverse Compute-Performance (Anthropic, July 2025)
+- For some tasks, **longer reasoning hurts accuracy**
+- More thinking != always better — calibration matters
+
+--
+
+## Faithfulness of Chain-of-Thought (Anthropic, July 2025)
+- "Reasoning models don't always say what they think"
+- Visible CoT may **not faithfully represent** the model's actual computation
+- **Implication**: Don't blindly trust CoT as a debugging or interpretability tool
+
+--
+
+## DeepSeek-R1 Insight
+- Pure RL (no supervised fine-tuning on reasoning traces) can produce sophisticated reasoning
+- "Aha moments" emerge spontaneously — models learn to re-examine and verify conclusions
+
+---
 class: center, middle
 
 # Q&A & Break
+
+---
+
+# Choosing a Reasoning LLM
+
+## The Current Landscape (2026)
+
+--
+
+| Model | Strengths | Pricing (per M tokens) |
+|---|---|---|
+| **o3** | Multimodal reasoning, tool use | $2 in / $8 out |
+| **o4-mini** | Cost-efficient, full tool use | $1.10 in / $4.40 out |
+| **GPT-5.2** | Integrated reasoning + chat | Responses API pricing |
+| **Claude Sonnet 4.5** | Hybrid thinking, 128K output | $3 in / $15 out |
+| **Gemini 2.5 Pro** | 2M context, dynamic budget | Competitive |
+| **DeepSeek-R1** | Open weights, strong math | Very low cost |
+| **QwQ-32B** | Open-source, runs locally | Free (Apache 2.0) |
 
 ---
 
@@ -684,15 +1004,15 @@ class: center, middle
 
 --
 
-### ✅ Core Capabilities
+### Core Capabilities
 - [ ] Built-in verifier support
 - [ ] Efficient multi-sample decoding
-- [ ] Configurable thinking budget
+- [ ] Configurable thinking budget / effort level
 - [ ] Self-consistency mechanisms
 
 --
 
-### ✅ Integration Features
+### Integration Features
 - [ ] RAG integration quality
 - [ ] API support for confidence scores
 - [ ] Streaming intermediate steps
@@ -700,7 +1020,7 @@ class: center, middle
 
 --
 
-### ✅ Training Approach
+### Training Approach
 - [ ] Prompted reasoning vs fine-tuned
 - [ ] RL-finetuned with verifiers
 - [ ] Domain-specific adaptations
@@ -714,7 +1034,7 @@ class: center, middle
 
 --
 
-### 💰 Cost Considerations
+### Cost Considerations
 - Token usage (thinking + output)
 - Sampling overhead (n-samples)
 - Latency requirements
@@ -722,7 +1042,7 @@ class: center, middle
 
 --
 
-### 📊 Performance Metrics
+### Performance Metrics
 - Accuracy on your specific tasks
 - Consistency across samples
 - Verifiability of outputs
@@ -730,11 +1050,11 @@ class: center, middle
 
 --
 
-### 🔧 Practical Factors
+### Practical Factors
 - API rate limits
-- Context window size
+- Context window size (Gemini: 2M, Claude: 200K, OpenAI: 200K)
 - Output format control
-- Error handling capabilities
+- Open-source vs proprietary (QwQ-32B and DeepSeek-R1 run locally)
 
 ---
 class: center, middle
@@ -743,76 +1063,66 @@ class: center, middle
 
 ---
 
-# Lab 1: Self-Consistency Implementation
+# Lab 1: OpenAI Responses API — Reasoning Effort
 
 .small-code[
 ```python
-import openai
+from openai import OpenAI
 from collections import Counter
 
-def reasoning_with_voting(question, n_samples=5):
-    """Implement self-consistency with majority voting"""
-    
-    prompt = f"""Solve step-by-step: {question}
-    Show your reasoning clearly.
-    Final answer: [your answer here]"""
-    
-    answers = []
-    reasoning_traces = []
-    
-    for i in range(n_samples):
-        response = openai.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
+client = OpenAI()
+
+def compare_reasoning_effort(question):
+    """Compare low vs high reasoning effort on the same question"""
+
+    for effort in ["low", "medium", "high"]:
+        response = client.responses.create(
+            model="o3",
+            reasoning={"effort": effort},
+            input=[{"role": "user", "content": question}]
         )
-        
-        full_response = response.choices[0].message.content
-        # Extract answer from response
-        answer = extract_final_answer(full_response)
-        answers.append(answer)
-        reasoning_traces.append(full_response)
-    
-    # Majority voting
-    final_answer = Counter(answers).most_common(1)[0][0]
-    return final_answer, reasoning_traces
+
+        print(f"--- Effort: {effort} ---")
+        print(f"Answer: {response.output_text[:200]}")
+        print(f"Usage: {response.usage}")
+        print("-" * 60)
+
+compare_reasoning_effort(
+    "How many r's are in the word 'strawberry'?"
+)
 ```
 ]
 
 ---
 
-# Lab 2: Confidence-Based Selection
+# Lab 2: Anthropic Extended Thinking
 
 .medium-code[
 ```python
-def confidence_scored_reasoning(question, n_samples=5):
-    """Select answer based on confidence, not length"""
-    
-    candidates = []
-    
-    for _ in range(n_samples):
-        # Generate reasoning
-        reasoning = generate_reasoning(question)
-        
-        # Extract answer
-        answer = extract_answer(reasoning)
-        
-        # Score confidence (using model self-evaluation)
-        confidence_prompt = f"""
-        Given this reasoning: {reasoning}
-        And answer: {answer}
-        Rate confidence (0-1): """
-        
-        confidence = get_confidence_score(confidence_prompt)
-        candidates.append({
-            'reasoning': reasoning,
-            'answer': answer,
-            'confidence': confidence
-        })
-    
-    # Select by confidence, not length!
-    best = max(candidates, key=lambda x: x['confidence'])
-    return best
+from anthropic import Anthropic
+
+client = Anthropic()
+
+def solve_with_thinking(question, budget=10000):
+    """Solve a problem with visible thinking process"""
+
+    response = client.messages.create(
+        model="claude-sonnet-4-5-20250514",
+        max_tokens=16000,
+        thinking={"type": "enabled", "budget_tokens": budget},
+        messages=[{"role": "user", "content": question}]
+    )
+
+    for block in response.content:
+        if block.type == "thinking":
+            print(f"Thinking ({len(block.thinking)} chars):")
+            print(block.thinking[:500] + "...")
+        elif block.type == "text":
+            print(f"\nAnswer: {block.text}")
+
+solve_with_thinking(
+    "A farmer has 17 sheep. All but 9 die. How many are left?"
+)
 ```
 ]
 
@@ -824,32 +1134,32 @@ def confidence_scored_reasoning(question, n_samples=5):
 ```python
 def rag_with_reasoning(query, documents):
     """Combine retrieval with chain-of-thought reasoning"""
-    
+
     # Step 1: Retrieve relevant context
     relevant_docs = retrieve_documents(query, documents, top_k=3)
-    
+
     # Step 2: Construct reasoning prompt with evidence
     prompt = f"""
     Question: {query}
-    
+
     Available Evidence:
     {format_documents(relevant_docs)}
-    
+
     Please:
     1. Analyze the evidence step by step
     2. Identify key information
     3. Reason through the problem
     4. Provide your conclusion
-    
+
     Let's think step by step:
     """
-    
+
     # Step 3: Generate reasoning with retrieval context
     response = generate_with_cot(prompt)
-    
+
     # Step 4: Verify answer against evidence
     verification = verify_against_sources(response, relevant_docs)
-    
+
     return {
         'answer': response,
         'sources': relevant_docs,
@@ -866,19 +1176,19 @@ def rag_with_reasoning(query, documents):
 ```python
 def numeric_puzzle_with_meta_reasoning(target):
     """Demonstrate explicit meta-strategies in reasoning"""
-    
+
     prompt = f"""
     Target number: {target}
-    
+
     Meta-strategy thinking:
     1. First, consider factorization of {target}
     2. Check if it's prime or composite
-    3. If composite, find factors near √{target} ≈ {int(target**0.5)}
+    3. If composite, find factors near sqrt({target}) = {int(target**0.5)}
     4. Consider arithmetic patterns
-    
+
     Now solve step by step using these strategies:
     """
-    
+
     # Generate with explicit thinking mode
     response = model.generate(
         prompt,
@@ -886,7 +1196,7 @@ def numeric_puzzle_with_meta_reasoning(target):
         max_thinking_tokens=1000,
         show_meta_reasoning=True
     )
-    
+
     return {
         'meta_strategy': extract_meta_strategy(response),
         'detailed_steps': extract_steps(response),
@@ -914,8 +1224,8 @@ class: center, middle
 --
 
 ## Current State: Benchmark Saturation
-- Single ground-truth answers are mostly solved
-- Need evaluation for open-ended tasks
+- AIME, GPQA Diamond now routinely saturated by frontier models
+- New harder evaluations needed (e.g., Humanity's Last Exam)
 - Focus shifting to real applications
 
 --
@@ -968,7 +1278,7 @@ class: center, middle
 --
 
 ### The Path Forward
-- Reasoning + Tools + Retrieval
+- Reasoning + Tools + Retrieval (agentic reasoning)
 - Continuous learning from feedback
 - Reasoning about reasoning (meta-cognition)
 
@@ -978,46 +1288,53 @@ class: center, middle
 
 --
 
-1. **Decoding Matters**: It's not just about prompting - how you sample and select changes everything
+1. **Test-Time Compute is the Paradigm Shift**: Scale thinking time per-query, not just model size
 
 --
 
-2. **Confidence Over Length**: Don't pick the longest rationale, pick the most confident answer
+2. **Every Lab Has Reasoning Now**: OpenAI, Anthropic, Google, DeepSeek — reasoning is standard
 
 --
 
-3. **Aggregation Wins**: Multiple samples + smart selection consistently beats single-shot
+3. **Use the Effort Dial**: `low` for simple tasks, `high` for hard ones — don't overspend
 
 --
 
-4. **Thinking Budget**: Scale output length, not just model size
+4. **Aggregation Wins**: Multiple samples + smart selection consistently beats single-shot
 
 --
 
-5. **Verifiers Are Key**: Success in RL fine-tuning depends on reliable verification
+5. **CoT is Not Always Faithful**: Don't blindly trust visible reasoning traces
 
 --
 
-6. **Combine Approaches**: Retrieval + Reasoning > Reasoning alone
+6. **Agentic Reasoning is the Future**: Think -> Act -> Observe -> Think loops
 
 --
 
-7. **Real Applications Need More**: Move beyond benchmarks to production systems
+7. **Combine Approaches**: Retrieval + Reasoning > Reasoning alone
+
+--
+
+8. **Real Applications Need More**: Move beyond benchmarks to production systems
 
 ---
 
 # Connect With Me
 
-## 📚 [Course materials](place-github-url)
-## 🔗 [LinkedIn](https://www.linkedin.com/in/lucas-soares-969044167/)
-## 🐦 [Twitter/X](https://x.com/LucasEnkrateia)
-## 📺 [YouTube](https://www.youtube.com/@automatalearninglab)
-## 📧 Email: lucasenkrateia@gmail.com
+## [Course materials](place-github-url)
+## [LinkedIn](https://www.linkedin.com/in/lucas-soares-969044167/)
+## [Twitter/X](https://x.com/LucasEnkrateia)
+## [YouTube](https://www.youtube.com/@automatalearninglab)
+## Email: lucasenkrateia@gmail.com
 
 ### References
 - Stanford CS-25: Reasoning with LLMs
 - Dziri et al. (2023) - Faith and Fate: Limits of Transformers on Compositionality
 - Wu et al. (2024) - Reasoning or Reciting? Exploring the Capabilities and Limitations
+- DeepSeek-R1 (2025) - Incentivizing Reasoning in LLMs via RL (published in *Nature*)
+- Anthropic (2025) - "Reasoning models don't always say what they think"
+- OpenAI (2025) - o3/o4-mini System Card & Responses API Documentation
 
 ---
     </textarea>
