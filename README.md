@@ -6,53 +6,52 @@ This repository contains materials for the O'Reilly live training course on reas
 
 **Link**: [Working with OpenAI and Anthropic Reasoning Models](https://www.oreilly.com/live-events/working-with-o1-deepseek-and-gemini-20-reasoning-capabilities/0642572015593/)
 
-This course explores the reasoning capabilities of OpenAI's GPT-5.2 and Anthropic's Claude models. Learn how to effectively leverage these models' advanced reasoning abilities for your applications.
+This course explores how modern reasoning models (OpenAI o-series, DeepSeek R1, Claude extended thinking) actually work — by building the R1-style training pipeline from scratch and walking through the DeepSeek R1 paper.
 
 ### Key Concepts Covered
 
-- What defines a reasoning/thinking model
+- What defines a reasoning/thinking model and how chain-of-thought emerges
+- The five-stage R1 recipe: pretraining → cold-start SFT → RL (GRPO) → rejection-sampling SFT → distillation
+- GRPO (Group Relative Policy Optimization) implemented from scratch
 - When to use reasoning models vs. traditional LLMs
-- How to choose the right reasoning effort level
-- Best practices for prompting reasoning models
-- Cost and performance optimization strategies
-- Integration patterns for production workflows
+- Reasoning across the OpenAI, Anthropic, and DeepSeek ecosystems
 
 ## Repository Structure
 
-- `notebooks/`: Jupyter notebooks for hands-on exercises
-  - `analytical-framework.ipynb`: LLM-as-a-Judge framework for evaluating model performance
-  - `openai-thinking-parameters.ipynb`: Comprehensive guide to OpenAI's GPT-5.2 with the Responses API
-  - `anthropic-extended-thinking.ipynb`: Guide to Anthropic's Claude extended thinking capabilities
-  - `assets-resources/`: Additional resources and reference materials
-- `presentation/`: Slides and presentation materials
-- `project-notes.md`: Notes and resources for the live course
+```
+notebooks/      # Hands-on notebooks building the R1 training pipeline from scratch
+presentation/   # Slide decks (markdown sources + rendered PDFs)
+scripts/        # Demo apps and comparison/decision-chart utilities
+requirements/   # Python dependencies
+```
 
-### Notebook Descriptions
+### Notebooks (`notebooks/`)
 
-#### 1. Analytical Framework (`analytical-framework.ipynb`)
-A practical framework for evaluating LLM performance using LLM-as-a-Judge methodology:
-- Compare model outputs across GPT-4o, GPT-5.2, and Claude Sonnet 4.5
-- Structured evaluation with Pydantic models
-- Cost analysis with real 2026 pricing
-- PDF-to-markdown conversion for document analysis
+Walks through the full R1-style reasoning-model training pipeline:
 
-#### 2. OpenAI Thinking Parameters (`openai-thinking-parameters.ipynb`)
-A hands-on guide to OpenAI's GPT-5.2 reasoning capabilities:
-- **Responses API**: New API designed for reasoning models
-- **Reasoning Effort Levels**: none, low, medium, high, xhigh
-- **Verbosity Control**: Independent output length control
-- **Tool Use**: Function calling and web search integration
-- **Structured Outputs**: Pydantic models for typed responses
-- **Best Practices**: Write briefs, focus on WHAT not HOW
+- `00_setup_check.ipynb` — verify environment and API keys
+- `01_chain_of_thought_intuition.ipynb` — what CoT is and why it works
+- `02_stage1_pretraining.ipynb` — Stage 1: base-model pretraining
+- `03_stage2_cold_start_sft.ipynb` — Stage 2: cold-start supervised fine-tuning
+- `04_stage3_rl_grpo_from_scratch.ipynb` — Stage 3: GRPO reinforcement learning, implemented from scratch
+- `05_stage4_rejection_sampling_sft.ipynb` — Stage 4: rejection-sampling SFT on RL outputs
+- `06_stage5_distillation.ipynb` — Stage 5: distilling the reasoning model into smaller students
 
-#### 3. Anthropic Extended Thinking (`anthropic-extended-thinking.ipynb`)
-A comprehensive tutorial on Claude's extended thinking feature:
-- **Budget Tokens**: Control reasoning depth (1K-32K+ tokens)
-- **Streaming**: Required for large outputs, improves UX
-- **Tool Use**: Integration with tool_choice: auto
-- **Interleaved Thinking**: Beta feature for Claude 4 models
-- **Summarized Thinking**: Claude 4+ returns summaries, billed for full tokens
-- **Best Practices**: Start minimal, don't say "think step by step"
+Checkpoint files (`cold_start.pt`, `after_grpo.pt`, `after_reject_sft.pt`) let you jump into any stage without re-running prior ones.
+
+### Presentation (`presentation/`)
+
+Three decks (markdown source + PDF):
+
+- `01-intro-reasoning-llms` — intro to reasoning LLMs and the landscape
+- `02-deepseek-r1-paper-walkthrough` — guided walkthrough of the DeepSeek R1 paper
+- `03-r1-recipe-five-stages` — overview of the five-stage R1 recipe mirrored by the notebooks
+
+### Scripts (`scripts/`)
+
+- `app1_math_comparator/`, `app2_logic_solver/`, `app3_planning_agent/` — demo apps showcasing reasoning-model use cases
+- `reasoning_llms_decision_chart.py` — decision tree for picking a reasoning model
+- `llm_model_comparison.py` — quick model comparison utility
 
 ## Getting Started
 
