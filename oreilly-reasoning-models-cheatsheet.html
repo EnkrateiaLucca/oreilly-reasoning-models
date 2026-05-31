@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working with OpenAI & Anthropic Reasoning Models — Cheatsheet</title>
+    <style>
+        /* ========================================
+           MODULAR GRID/CARD LAYOUT TEMPLATE
+           Optimized for A4 printing (210mm × 297mm)
+           ======================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 14mm;
+            @top-left { content: none; }
+            @top-center { content: none; }
+            @top-right { content: none; }
+            @bottom-left { content: none; }
+            @bottom-center { content: none; }
+            @bottom-right { content: none; }
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.45;
+            color: #000;
+            background: #fff;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 14mm;
+        }
+
+        /* Header Section */
+        .page-header {
+            text-align: center;
+            padding-bottom: 10pt;
+            margin-bottom: 12pt;
+            border-bottom: 3px solid #000;
+        }
+
+        .page-header h1 {
+            font-size: 20pt;
+            font-weight: 700;
+            margin-bottom: 4pt;
+            text-transform: uppercase;
+            letter-spacing: 1.5pt;
+        }
+
+        .page-header .subtitle {
+            font-size: 11pt;
+            color: #333;
+            margin-bottom: 4pt;
+        }
+
+        .page-header .meta {
+            font-size: 8.5pt;
+            color: #666;
+        }
+
+        /* Section Headers */
+        .section-title {
+            font-size: 12pt;
+            font-weight: 700;
+            margin: 12pt 0 8pt 0;
+            padding: 5pt 10pt;
+            background: #000;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1pt;
+            break-after: avoid;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8pt;
+            margin-bottom: 10pt;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8pt;
+            margin-bottom: 10pt;
+        }
+
+        /* Card Components */
+        .card {
+            border: 2px solid #000;
+            padding: 8pt;
+            background: #fff;
+            break-inside: avoid;
+        }
+
+        .card-title {
+            font-size: 10.5pt;
+            font-weight: 700;
+            margin-bottom: 6pt;
+            padding-bottom: 4pt;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .card-content {
+            font-size: 9pt;
+        }
+
+        .card-light {
+            border: 2px solid #000;
+            background: #f9f9f9;
+            padding: 8pt;
+            break-inside: avoid;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border: 2px solid #666;
+            border-left: 5px solid #000;
+            padding: 8pt;
+            margin: 8pt 0;
+            background: #f5f5f5;
+            break-inside: avoid;
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            font-size: 10pt;
+            margin-bottom: 4pt;
+        }
+
+        /* Code Blocks */
+        .code-card {
+            border: 2px solid #000;
+            background: #fff;
+            padding: 0;
+            break-inside: avoid;
+        }
+
+        .code-card-header {
+            background: #000;
+            color: #fff;
+            padding: 5pt 8pt;
+            font-weight: 700;
+            font-size: 9.5pt;
+        }
+
+        .code-card pre {
+            margin: 0;
+            padding: 8pt;
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 8pt;
+            line-height: 1.35;
+            background: #f9f9f9;
+            overflow: hidden;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+
+        /* Tables */
+        .table-card {
+            border: 2px solid #000;
+            background: #fff;
+            padding: 0;
+            break-inside: avoid;
+            margin-bottom: 10pt;
+        }
+
+        .table-card-header {
+            background: #000;
+            color: #fff;
+            padding: 5pt 8pt;
+            font-weight: 700;
+            font-size: 10pt;
+        }
+
+        .table-card table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+        }
+
+        .table-card th {
+            background: #f0f0f0;
+            color: #000;
+            font-weight: 700;
+            text-align: left;
+            padding: 5pt 7pt;
+            border-bottom: 2px solid #000;
+        }
+
+        .table-card td {
+            padding: 5pt 7pt;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .table-card tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Lists in Cards */
+        .card ul, .card ol, .card-light ul, .card-light ol {
+            margin-left: 14pt;
+        }
+
+        .card li, .card-light li {
+            margin-bottom: 3pt;
+        }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8pt;
+            margin: 8pt 0 10pt 0;
+        }
+
+        .comparison-item {
+            border: 2px solid #000;
+            padding: 8pt;
+            background: #fff;
+            break-inside: avoid;
+        }
+
+        .comparison-header {
+            font-weight: 700;
+            font-size: 11pt;
+            margin-bottom: 6pt;
+            padding-bottom: 5pt;
+            border-bottom: 2px solid #000;
+            text-align: center;
+        }
+
+        .comparison-item ul {
+            margin-left: 14pt;
+        }
+
+        .comparison-item li {
+            margin-bottom: 3pt;
+            font-size: 9pt;
+        }
+
+        /* Key Points Box */
+        .key-points {
+            border: 3px solid #000;
+            background: #f9f9f9;
+            padding: 10pt;
+            margin: 10pt 0;
+            break-inside: avoid;
+        }
+
+        .key-points-title {
+            font-weight: 700;
+            font-size: 11pt;
+            margin-bottom: 8pt;
+            text-transform: uppercase;
+        }
+
+        .key-points ul {
+            margin-left: 14pt;
+            column-count: 2;
+            column-gap: 20pt;
+        }
+
+        .key-points li {
+            margin-bottom: 4pt;
+            font-size: 9pt;
+            break-inside: avoid;
+        }
+
+        /* Decision Box */
+        .decision-box {
+            border: 2px solid #000;
+            padding: 8pt;
+            background: #fff;
+            break-inside: avoid;
+            margin-bottom: 10pt;
+        }
+
+        .decision-box pre {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 8.5pt;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+
+        /* Badge / highlight */
+        .badge {
+            display: inline-block;
+            background: #000;
+            color: #fff;
+            padding: 1pt 5pt;
+            font-size: 7.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-right: 3pt;
+        }
+
+        code {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 8.5pt;
+            background: #f0f0f0;
+            padding: 1pt 3pt;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 14pt;
+            padding-top: 8pt;
+            border-top: 2px solid #000;
+            text-align: center;
+            font-size: 7.5pt;
+            color: #666;
+        }
+
+        .mb-small { margin-bottom: 6pt; }
+        .mb-medium { margin-bottom: 10pt; }
+
+        /* Print Optimization */
+        @media print {
+            body {
+                margin: 0;
+                padding: 14mm;
+            }
+
+            .card, .card-light, .info-box, .code-card,
+            .table-card, .comparison-item, .key-points,
+            .decision-box {
+                break-inside: avoid;
+            }
+
+            .section-title {
+                break-after: avoid;
+            }
+
+            a {
+                text-decoration: none;
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Working with OpenAI &amp; Anthropic Reasoning Models</h1>
+        <div class="subtitle">O'Reilly Live Training — Quick Reference Cheatsheet</div>
+        <div class="meta">Lucas Soares &nbsp;|&nbsp; GPT-5.2 · Claude Extended Thinking · DeepSeek R1 &nbsp;|&nbsp; 2026</div>
+    </div>
+
+    <!-- SECTION 1: What is a Reasoning Model -->
+    <div class="section-title">1. What Is a Reasoning / Thinking Model?</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">Core Characteristics</div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>Chain-of-Thought (CoT)</strong> — spends time "thinking" before answering</li>
+                    <li><strong>Intermediate steps</strong> — shows work, transparent &amp; verifiable</li>
+                    <li><strong>Variable compute</strong> — allocates more tokens for harder problems</li>
+                    <li><strong>RL-trained</strong> — rewarded for step-by-step logical reasoning</li>
+                    <li><strong>Self-critique</strong> — revises and verifies its own answers</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">System 1 vs System 2 Thinking</div>
+            <div class="card-content">
+                <table style="width:100%; font-size:8.5pt; border-collapse:collapse;">
+                    <tr style="background:#f0f0f0;">
+                        <th style="padding:4pt 6pt; border-bottom:1px solid #000; text-align:left;">Traditional LLMs</th>
+                        <th style="padding:4pt 6pt; border-bottom:1px solid #000; text-align:left;">Reasoning Models</th>
+                    </tr>
+                    <tr>
+                        <td style="padding:4pt 6pt; border-bottom:1px solid #eee;">Fast, intuitive (System 1)</td>
+                        <td style="padding:4pt 6pt; border-bottom:1px solid #eee;">Slow, methodical (System 2)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4pt 6pt; border-bottom:1px solid #eee;">Pattern matching</td>
+                        <td style="padding:4pt 6pt; border-bottom:1px solid #eee;">Step-by-step analysis</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4pt 6pt; border-bottom:1px solid #eee;">Fixed forward passes</td>
+                        <td style="padding:4pt 6pt; border-bottom:1px solid #eee;">Variable compute time</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4pt 6pt;">General RLHF</td>
+                        <td style="padding:4pt 6pt;">RL with reasoning rewards</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="card">
+            <div class="card-title">OpenAI o-series</div>
+            <div class="card-content">
+                <ul>
+                    <li>o1, o3, o4-mini</li>
+                    <li>Proprietary, API-only</li>
+                    <li>Reasoning effort: <code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code></li>
+                    <li>Responses API (stateful)</li>
+                    <li>Vision support (o1+)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Anthropic Claude</div>
+            <div class="card-content">
+                <ul>
+                    <li>Claude 4 Opus/Sonnet</li>
+                    <li>Extended Thinking mode</li>
+                    <li>Budget tokens: 1K–32K+</li>
+                    <li>Interleaved thinking (Beta)</li>
+                    <li>Summarized thinking (Claude 4+)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">DeepSeek R1</div>
+            <div class="card-content">
+                <ul>
+                    <li>671B params, MIT license</li>
+                    <li>Open-source, self-hostable</li>
+                    <li>Distilled: 1.5B–70B params</li>
+                    <li>Strong math reasoning</li>
+                    <li>Hugging Face ecosystem</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: When to Use -->
+    <div class="section-title">2. When to Use Reasoning Models</div>
+
+    <div class="comparison-grid">
+        <div class="comparison-item">
+            <div class="comparison-header">Use Reasoning Models When…</div>
+            <ul>
+                <li>Accuracy &amp; reliability &gt; speed</li>
+                <li>Complex, ambiguous, multi-step problems</li>
+                <li>Explainable reasoning chains required</li>
+                <li>Agentic planning &amp; orchestration ("the planner")</li>
+                <li>Finding relationships across large datasets</li>
+                <li>Code review &amp; architecture decisions</li>
+                <li>LLM-as-judge evaluation tasks</li>
+                <li>Navigating dense unstructured documents</li>
+                <li>Visual reasoning over complex charts</li>
+            </ul>
+        </div>
+        <div class="comparison-item">
+            <div class="comparison-header">Use Traditional LLMs When…</div>
+            <ul>
+                <li>Speed and cost are primary concerns</li>
+                <li>Well-defined, straightforward tasks</li>
+                <li>Task <em>execution</em> (not planning)</li>
+                <li>Creative writing &amp; conversational chat</li>
+                <li>Content generation at volume</li>
+                <li>Low-latency interactive applications</li>
+                <li>Routing, summarization, triage</li>
+                <li>o-series planner → GPT "doer" steps</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SECTION 3: Real-World Use Cases -->
+    <div class="section-title">3. Real-World Use Cases (with Results)</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">Proven Enterprise Results</div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>Tax research</strong> — 4× performance boost (multi-doc reasoning, Blue J)</li>
+                    <li><strong>Code review</strong> — 3× conversion increase (CodeRabbit)</li>
+                    <li><strong>LLM-as-judge</strong> — F1 score 0.12 → 0.74 (Braintrust)</li>
+                    <li><strong>Image classification</strong> — 88% vs 50% accuracy (SafetyKit)</li>
+                    <li><strong>Legal analysis</strong> — 52% stronger on complex contracts (Hebbia)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Application Domains</div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>Document Analysis</strong> — contracts, financial statements, legal</li>
+                    <li><strong>Code</strong> — debugging, architecture, one-shotting entire files</li>
+                    <li><strong>Decision Support</strong> — financial analysis, risk assessment</li>
+                    <li><strong>Agentic Workflows</strong> — o-series plans, GPT executes</li>
+                    <li><strong>Research</strong> — hypothesis testing, paper synthesis</li>
+                    <li><strong>Visual Reasoning</strong> — architectural drawings, dense charts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4: How to Choose -->
+    <div class="section-title">4. Choosing the Right Model — Key Criteria</div>
+
+    <div class="table-card">
+        <div class="table-card-header">Selection Criteria &amp; Trade-offs</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Criterion</th>
+                    <th>What to Evaluate</th>
+                    <th>Trade-off</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Reasoning Quality</strong></td>
+                    <td>CoT capabilities, logical consistency, benchmarks (MATH, GSM8K, MMLU)</td>
+                    <td>Higher quality = higher cost &amp; latency</td>
+                </tr>
+                <tr>
+                    <td><strong>Embedded Knowledge</strong></td>
+                    <td>Domain expertise, factual accuracy, knowledge cutoff date</td>
+                    <td>Freshness vs. depth of specialization</td>
+                </tr>
+                <tr>
+                    <td><strong>Context Window</strong></td>
+                    <td>Document length, multi-turn conversation capacity</td>
+                    <td>Larger window = more compute cost</td>
+                </tr>
+                <tr>
+                    <td><strong>Deployment</strong></td>
+                    <td>API-only vs. self-hostable; cloud vs. on-premises</td>
+                    <td>Control &amp; privacy vs. maintenance overhead</td>
+                </tr>
+                <tr>
+                    <td><strong>Cost</strong></td>
+                    <td>Cost per token, inference speed, hardware requirements</td>
+                    <td>Performance vs. operational cost</td>
+                </tr>
+                <tr>
+                    <td><strong>Specialization</strong></td>
+                    <td>Code, math, multimodal, multilingual support</td>
+                    <td>Generality vs. best-in-class for specific task</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECTION 5: Prompting -->
+    <div class="section-title">5. How to Prompt Reasoning Models</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">OpenAI o-series (o1, o3, o4-mini)</div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>Write briefs, not prompts</strong> — 10× more context than you think</li>
+                    <li><strong>Focus on WHAT, not HOW</strong> — let the model plan its approach</li>
+                    <li><strong>Keep it direct</strong> — no "think step by step" needed (redundant)</li>
+                    <li><strong>Do NOT chain-of-thought prompt</strong> — model reasons internally</li>
+                    <li><strong>Use delimiters</strong> — markdown, XML tags, section titles</li>
+                    <li><strong>Zero-shot first</strong>, then few-shot if needed</li>
+                    <li><strong>Define success criteria</strong> — let model self-evaluate</li>
+                    <li><strong>Developer messages</strong> (not system messages) for o1-2024-12-17+</li>
+                    <li><strong>Reasoning effort API</strong>: <code>none</code> / <code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code></li>
+                    <li><strong>Responses API</strong> with <code>store=true</code> for multi-turn + tool calls</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Anthropic Claude Extended Thinking</div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>Budget tokens</strong> — control depth: 1K (quick) → 32K+ (deep)</li>
+                    <li><strong>Start minimal</strong> — don't say "think step by step" (redundant)</li>
+                    <li><strong>Streaming required</strong> for large outputs (improves UX)</li>
+                    <li><strong>Tool use</strong>: set <code>tool_choice: auto</code></li>
+                    <li><strong>Interleaved thinking</strong> — Beta, Claude 4 models only</li>
+                    <li><strong>Summarized thinking</strong> — Claude 4+ returns summary; billed for full tokens</li>
+                    <li><strong>Show progress</strong> — stream thinking blocks to reduce perceived latency</li>
+                    <li><strong>Complex tasks</strong> — increase budget progressively, don't start at max</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box mb-small">
+        <div class="info-box-title">Key Mental Model: o1 is a "Report Generator", not a Chat Model</div>
+        <p>Treat it like email, not texting. Give full context upfront (company background, schemas, code, constraints). Ask for one specific output. Define what "good" looks like. It will one-shot entire files — but won't iteratively chat its way to a solution.</p>
+    </div>
+
+    <!-- SECTION 6: API Code -->
+    <div class="section-title">6. API Quick Reference</div>
+
+    <div class="grid-2">
+        <div class="code-card">
+            <div class="code-card-header">OpenAI — Responses API (o3)</div>
+            <pre><code>from openai import OpenAI
+client = OpenAI()
+
+response = client.responses.create(
+    model="o3",
+    reasoning={"effort": "high"},
+    input=[{
+        "role": "user",
+        "content": "Your detailed brief here..."
+    }],
+    store=True  # enable multi-turn reasoning
+)
+print(response.output_text)</code></pre>
+        </div>
+        <div class="code-card">
+            <div class="code-card-header">Anthropic — Extended Thinking (Claude)</div>
+            <pre><code>import anthropic
+client = anthropic.Anthropic()
+
+response = client.messages.create(
+    model="claude-opus-4-7",
+    max_tokens=16000,
+    thinking={
+        "type": "enabled",
+        "budget_tokens": 10000
+    },
+    messages=[{
+        "role": "user",
+        "content": "Your problem here..."
+    }]
+)
+# Access thinking: response.content[0]
+# Access answer: response.content[1]</code></pre>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="code-card">
+            <div class="code-card-header">OpenAI — Streaming Reasoning</div>
+            <pre><code>with client.responses.stream(
+    model="o3",
+    reasoning={"effort": "medium"},
+    input=[{"role": "user", "content": brief}]
+) as stream:
+    for event in stream:
+        # Handle text deltas in real-time
+        if event.type == "response.text.delta":
+            print(event.delta, end="", flush=True)</code></pre>
+        </div>
+        <div class="code-card">
+            <div class="code-card-header">Anthropic — Streaming Extended Thinking</div>
+            <pre><code>with client.messages.stream(
+    model="claude-opus-4-7",
+    max_tokens=16000,
+    thinking={"type":"enabled","budget_tokens":8000},
+    messages=[{"role":"user","content":problem}]
+) as stream:
+    for event in stream:
+        if event.type == "content_block_delta":
+            # thinking_delta or text_delta
+            print(event.delta)</code></pre>
+        </div>
+    </div>
+
+    <!-- SECTION 7: DeepSeek vs o1 -->
+    <div class="section-title">7. DeepSeek R1 vs OpenAI o1 — Comparison</div>
+
+    <div class="table-card mb-medium">
+        <div class="table-card-header">Model Comparison</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th>DeepSeek R1</th>
+                    <th>OpenAI o1/o3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>License</strong></td>
+                    <td>Open-source (MIT)</td>
+                    <td>Proprietary</td>
+                </tr>
+                <tr>
+                    <td><strong>Size</strong></td>
+                    <td>671B parameters (full)</td>
+                    <td>Undisclosed</td>
+                </tr>
+                <tr>
+                    <td><strong>Access</strong></td>
+                    <td>API + self-host + Hugging Face</td>
+                    <td>OpenAI API only</td>
+                </tr>
+                <tr>
+                    <td><strong>Cost</strong></td>
+                    <td>Free (self-host) / API pricing</td>
+                    <td>Pay-per-token</td>
+                </tr>
+                <tr>
+                    <td><strong>Math</strong></td>
+                    <td>Particularly strong</td>
+                    <td>Excellent (occasional gaps)</td>
+                </tr>
+                <tr>
+                    <td><strong>Customization</strong></td>
+                    <td>Full: quantize, fine-tune, prune</td>
+                    <td>Limited</td>
+                </tr>
+                <tr>
+                    <td><strong>Deployment</strong></td>
+                    <td>Cloud + on-premises + edge</td>
+                    <td>Cloud only</td>
+                </tr>
+                <tr>
+                    <td><strong>Ecosystem</strong></td>
+                    <td>Growing OSS community</td>
+                    <td>Mature commercial support</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="info-box mb-small">
+        <div class="info-box-title">Distilled Models (DeepSeek-R1-Distill)</div>
+        <p>
+            Available in 1.5B → 70B parameter sizes. Achieve 80–95% of teacher model performance.
+            <strong>Llama-70B distill:</strong> 94.5% on MATH-500, 86.7% on AIME 2024.
+            <strong>Qwen-32B distill</strong> outperforms OpenAI-o1-mini across multiple benchmarks.
+            Use when: resource-constrained, edge deployment, latency-sensitive, or cost-sensitive applications.
+        </p>
+    </div>
+
+    <!-- SECTION 8: Limitations -->
+    <div class="section-title">8. Limitations &amp; Mitigation Strategies</div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">Known Limitations</div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>Latency</strong> — significantly longer response times</li>
+                    <li><strong>Cost</strong> — more reasoning tokens = higher cost</li>
+                    <li><strong>Domain brittleness</strong> — inconsistent across subject areas</li>
+                    <li><strong>Over-confidence</strong> — may present flawed reasoning confidently</li>
+                    <li><strong>Knowledge cutoff</strong> — bounded by training data</li>
+                    <li><strong>Not for</strong> — creative writing in specific voices</li>
+                    <li><strong>Not for</strong> — building entire apps in one shot</li>
+                    <li><strong>Context limits</strong> — struggles with very long reasoning chains</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Mitigation Strategies</div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>Hybrid approach</strong> — reasoning model plans, GPT executes</li>
+                    <li><strong>Fallback mechanisms</strong> — alternate path when reasoning fails</li>
+                    <li><strong>Human-in-the-loop</strong> — critical decisions need human review</li>
+                    <li><strong>Progressive UI</strong> — stream thinking steps to reduce perceived latency</li>
+                    <li><strong>Model ensembles</strong> — consensus from multiple models</li>
+                    <li><strong>Domain testing</strong> — benchmark on your specific task type</li>
+                    <li><strong>Distilled models</strong> — for cost/latency-sensitive deployments</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 9: Course Notebooks -->
+    <div class="section-title">9. Course Notebooks</div>
+
+    <div class="grid-3">
+        <div class="card-light">
+            <div class="card-title">analytical-framework.ipynb</div>
+            <div class="card-content">
+                <ul>
+                    <li>LLM-as-a-Judge framework</li>
+                    <li>Compare GPT-4o, GPT-5.2, Claude Sonnet 4.5</li>
+                    <li>Pydantic structured evaluation</li>
+                    <li>Cost analysis with 2026 pricing</li>
+                    <li>PDF-to-markdown conversion</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card-light">
+            <div class="card-title">openai-thinking-parameters.ipynb</div>
+            <div class="card-content">
+                <ul>
+                    <li>GPT-5.2 Responses API deep-dive</li>
+                    <li>Reasoning effort levels (none→xhigh)</li>
+                    <li>Verbosity control (independent)</li>
+                    <li>Tool use + web search integration</li>
+                    <li>Structured outputs with Pydantic</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card-light">
+            <div class="card-title">anthropic-extended-thinking.ipynb</div>
+            <div class="card-content">
+                <ul>
+                    <li>Claude extended thinking setup</li>
+                    <li>Budget tokens tuning (1K–32K+)</li>
+                    <li>Streaming implementation</li>
+                    <li>Interleaved thinking (Beta)</li>
+                    <li>Tool use with extended thinking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 10: Decision Framework -->
+    <div class="section-title">10. Quick Decision Framework</div>
+
+    <div class="grid-2">
+        <div class="decision-box">
+            <div style="font-weight:700; font-size:10pt; margin-bottom:6pt;">Model Selection Tree</div>
+            <pre>Need reasoning model?
+├─ Speed &gt; accuracy? → GPT-4o / traditional LLM
+├─ Complex + ambiguous problem?
+│   ├─ Need on-premises? → DeepSeek R1 (self-host)
+│   ├─ Cost-sensitive? → Distilled model (32B)
+│   ├─ Best accuracy? → OpenAI o3 or Claude Opus
+│   └─ Vision needed? → OpenAI o1/o3
+└─ Agentic workflow?
+    ├─ Planner role → o-series / Claude Extended Thinking
+    └─ Executor role → GPT-4o / Claude Sonnet (fast)</pre>
+        </div>
+        <div class="card">
+            <div class="card-title">Reasoning Effort Guidelines</div>
+            <div class="card-content">
+                <table style="width:100%; font-size:8.5pt; border-collapse:collapse;">
+                    <tr style="background:#f0f0f0;">
+                        <th style="padding:4pt 5pt; border-bottom:1px solid #000; text-align:left;">Effort</th>
+                        <th style="padding:4pt 5pt; border-bottom:1px solid #000; text-align:left;">Use When</th>
+                    </tr>
+                    <tr><td style="padding:4pt 5pt; border-bottom:1px solid #eee;"><code>low</code></td><td style="padding:4pt 5pt; border-bottom:1px solid #eee;">Well-defined, structured tasks</td></tr>
+                    <tr><td style="padding:4pt 5pt; border-bottom:1px solid #eee;"><code>medium</code></td><td style="padding:4pt 5pt; border-bottom:1px solid #eee;">Most standard complex problems</td></tr>
+                    <tr><td style="padding:4pt 5pt; border-bottom:1px solid #eee;"><code>high</code></td><td style="padding:4pt 5pt; border-bottom:1px solid #eee;">Multi-doc analysis, hard math</td></tr>
+                    <tr><td style="padding:4pt 5pt;"><code>xhigh</code></td><td style="padding:4pt 5pt;">Maximum accuracy critical tasks</td></tr>
+                </table>
+                <div style="margin-top:8pt; font-size:8.5pt;">
+                    <strong>Claude budget tokens:</strong><br>
+                    1K–2K = quick reasoning<br>
+                    8K–16K = standard complex tasks<br>
+                    32K+ = deep analysis, long documents
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="key-points">
+        <div class="key-points-title">Key Takeaways</div>
+        <ul>
+            <li><strong>Reasoning models</strong> trade speed for accuracy via internal CoT</li>
+            <li><strong>Write briefs</strong> for o-series — 10× context, clear goals, one output</li>
+            <li><strong>Budget tokens</strong> control Claude thinking depth (start minimal)</li>
+            <li><strong>Don't say</strong> "think step by step" — redundant for both APIs</li>
+            <li><strong>DeepSeek R1</strong> is open-source, self-hostable, MIT licensed</li>
+            <li><strong>Distilled models</strong> reach 80–95% of teacher model performance</li>
+            <li><strong>Planner + doer pattern</strong> — o-series plans, GPT executes</li>
+            <li><strong>Stream responses</strong> to manage latency expectations in production</li>
+            <li><strong>Hybrid fallbacks</strong> — design for when reasoning fails or times out</li>
+            <li><strong>Benchmark on YOUR domain</strong> — performance varies significantly by task type</li>
+        </ul>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 Automata Learning Lab &nbsp;|&nbsp; O'Reilly Live Training: Working with OpenAI &amp; Anthropic Reasoning Models &nbsp;|&nbsp; Lucas Soares</p>
+    </footer>
+
+</body>
+</html>
