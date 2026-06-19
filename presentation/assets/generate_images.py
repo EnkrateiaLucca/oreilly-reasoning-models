@@ -31,7 +31,7 @@ def direct_vs_thinking():
     fig, axes = plt.subplots(1, 2, figsize=(11, 5))
     for ax in axes:
         ax.set_xticks([]); ax.set_yticks([])
-    axes[0].set_title("GPT-4 — direct answer", fontsize=13, fontweight="bold")
+    axes[0].set_title("gpt-5.5 (low effort) — direct answer", fontsize=13, fontweight="bold")
     axes[0].text(0.05, 0.9,
         "Q: A train leaves Lisbon at 3pm\n"
         "   going 80 km/h. Another leaves\n"
@@ -41,7 +41,7 @@ def direct_vs_thinking():
         family="monospace", va="top", fontsize=11)
     for s in axes[0].spines.values(): s.set_edgecolor("#bbb")
 
-    axes[1].set_title("o1 / R1 — with <think> trace", fontsize=13, fontweight="bold")
+    axes[1].set_title("gpt-5.5 (high effort) / R1 — with <think> trace", fontsize=13, fontweight="bold")
     axes[1].text(0.05, 0.95,
         "<think>\n"
         " Distance Lisbon↔Porto ≈ 300 km.\n"
@@ -60,21 +60,22 @@ def direct_vs_thinking():
 
 # ---------- 01: timeline ----------
 def timeline():
-    """Curated reasoning-model milestones, Sep 2024 → Sep 2025.
-    Labels stagger above/below the line to fit 10 entries legibly.
+    """Curated reasoning-model milestones, Sep 2024 → Apr 2026.
+    Labels stagger above/below the line to fit 11 entries legibly.
     """
     fig, ax = plt.subplots(figsize=(15, 5.5))
     events = [
         ("2024-09", "OpenAI\no1-preview",   "first public\nreasoning model"),
-        ("2024-11", "Qwen\nQwQ-32B",        "first open\nreasoning weights"),
         ("2025-01", "DeepSeek\nR1",         "open recipe\n@ o1 level"),
-        ("2025-02", "xAI\nGrok 3",          "\"Think\" mode"),
         ("2025-02", "Claude\n3.7 Sonnet",   "hybrid\nthinking toggle"),
         ("2025-03", "Gemini\n2.5 Pro",      "thinking\nbuilt-in"),
         ("2025-04", "OpenAI\no3 / o4-mini", "tools inside\nthe reasoning loop"),
-        ("2025-04", "Qwen3",                "open hybrid\nthinking family"),
-        ("2025-06", "Mistral\nMagistral",   "first European\nreasoning model"),
         ("2025-08", "OpenAI\nGPT-5",        "unified router\n(fast + think)"),
+        ("2025-11", "Gemini\n3.0",          "frontier\nmultimodal reasoning"),
+        ("2026-04", "OpenAI\nGPT-5.5",      "current flagship\n(adds xhigh)"),
+        ("2026-04", "Claude\nOpus 4.7",     "self-checking\n+ xhigh tier"),
+        ("2026-04", "DeepSeek\nV4",         "open recipe\nstill scaling"),
+        ("2026-04", "Gemini\n3.1 Pro",      "frontier\nreasoning refresh"),
     ]
     n = len(events)
     xs = np.arange(n)
@@ -102,7 +103,7 @@ def timeline():
     ax.set_ylim(-1.7, 1.7)
     ax.set_xlim(-0.8, n - 0.2)
     ax.axis("off")
-    ax.set_title("The reasoning-model wave  ·  Sep 2024 → Aug 2025",
+    ax.set_title("The reasoning-model wave  ·  Sep 2024 → Apr 2026",
                  fontsize=15, fontweight="bold", pad=18)
     save(fig, "01_timeline.png")
 
@@ -127,8 +128,8 @@ def decision_chart():
     box(3.5, 6.5, 3, 1, "Task needs\nmulti-step reasoning?")
     box(0.3, 4, 3, 1, "Vanilla LLM\n+ step-by-step", color="#f0f0f0", edge="#888")
     box(6.7, 4, 3, 1, "Latency-critical?")
-    box(4.2, 1.8, 3, 1, "Low effort\n(o1-mini / R1-Distill)")
-    box(7.3, 0.3, 2.5, 1, "Full reasoning\n(o1 / R1)")
+    box(4.2, 1.8, 3, 1, "Low effort\n(gpt-5.5 low / R1-Distill)")
+    box(7.3, 0.3, 2.5, 1, "Full reasoning\n(gpt-5.5 high / R1)")
 
     arrow(4.5, 6.5, 2.3, 5.0, "no")
     arrow(6.0, 6.5, 8.0, 5.0, "yes")

@@ -71,7 +71,7 @@ Math · code · planning · multi-constraint puzzles.
 
 ## Reasoning effort knobs
 
-- **OpenAI:** `reasoning_effort = none / low / medium / high`
+- **OpenAI:** `reasoning_effort = none / low / medium / high / xhigh`
 - **Anthropic:** `thinking.budget_tokens = N`
 
 ---
