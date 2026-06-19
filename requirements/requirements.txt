@@ -28,7 +28,9 @@ charset-normalizer==3.4.2
 click==8.2.1
     # via streamlit
 comm==0.2.2
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   ipywidgets
 contourpy==1.3.3
     # via matplotlib
 cycler==0.12.1
@@ -76,9 +78,13 @@ idna==3.10
 ipykernel==6.29.5
     # via -r ./requirements/requirements.in
 ipython==9.0.2
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   ipywidgets
 ipython-pygments-lexers==1.1.1
     # via ipython
+ipywidgets==8.1.8
+    # via -r ./requirements/requirements.in
 jedi==0.19.2
     # via ipython
 jinja2==3.1.6
@@ -98,6 +104,8 @@ jupyter-core==5.7.2
     # via
     #   ipykernel
     #   jupyter-client
+jupyterlab-widgets==3.0.16
+    # via ipywidgets
 kiwisolver==1.4.9
     # via matplotlib
 markupsafe==3.0.2
@@ -247,9 +255,7 @@ rpds-py==0.26.0
 safetensors==0.5.3
     # via transformers
 setuptools==82.0.1
-    # via
-    #   torch
-    #   triton
+    # via triton
 six==1.17.0
     # via python-dateutil
 smmap==5.0.2
@@ -287,6 +293,7 @@ traitlets==5.14.3
     #   comm
     #   ipykernel
     #   ipython
+    #   ipywidgets
     #   jupyter-client
     #   jupyter-core
     #   matplotlib-inline
@@ -297,10 +304,13 @@ triton==3.3.1
 typing-extensions==4.12.2
     # via
     #   altair
+    #   anyio
     #   huggingface-hub
+    #   ipython
     #   openai
     #   pydantic
     #   pydantic-core
+    #   referencing
     #   streamlit
     #   torch
     #   typing-inspection
@@ -314,3 +324,5 @@ watchdog==6.0.0
     # via streamlit
 wcwidth==0.2.13
     # via prompt-toolkit
+widgetsnbextension==4.0.15
+    # via ipywidgets
