@@ -73,7 +73,7 @@ def timeline():
         ("2025-08", "OpenAI\nGPT-5",        "unified router\n(fast + think)"),
         ("2025-11", "Gemini\n3.0",          "frontier\nmultimodal reasoning"),
         ("2026-04", "OpenAI\nGPT-5.5",      "current flagship\n(adds xhigh)"),
-        ("2026-04", "Claude\nOpus 4.7",     "self-checking\n+ xhigh tier"),
+        ("2026-04", "Claude\nOpus 4.7",     "extended thinking\n+ self-checking"),
         ("2026-04", "DeepSeek\nV4",         "open recipe\nstill scaling"),
         ("2026-04", "Gemini\n3.1 Pro",      "frontier\nreasoning refresh"),
     ]
