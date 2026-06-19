@@ -1,19 +1,22 @@
 # O'Reilly Reasoning Models Course
 
-Course on OpenAI GPT-5.2 and Anthropic Claude reasoning capabilities.
+Course on reasoning models: building the DeepSeek R1-style training pipeline from scratch, plus OpenAI reasoning-model demo apps. Anthropic Claude extended thinking is covered conceptually in the slides.
 
 ## Structure
 
 ```
-notebooks/           # Jupyter notebooks (main content)
-├── openai-thinking-parameters.ipynb    # GPT-5.2 Responses API, reasoning effort levels
-├── anthropic-extended-thinking.ipynb   # Claude budget_tokens, streaming, interleaved thinking
-├── gpt-5.2-prompting-guide.ipynb       # GPT-5.2 prompting techniques (verbosity, scope, extraction)
-├── analytical-framework.ipynb          # LLM-as-Judge evaluation framework
-└── assets-resources/                   # Reference PDFs, images
+notebooks/           # Jupyter notebooks — the R1-style pipeline, built from scratch
+├── 00_setup_check.ipynb                  # Verify environment and API keys
+├── 01_chain_of_thought_intuition.ipynb   # What CoT is and why it works
+├── 02_stage1_pretraining.ipynb           # Stage 1: base-model pretraining
+├── 03_stage2_cold_start_sft.ipynb        # Stage 2: cold-start supervised fine-tuning
+├── 04_stage3_rl_grpo_from_scratch.ipynb  # Stage 3: GRPO RL implemented from scratch
+├── 05_stage4_rejection_sampling_sft.ipynb # Stage 4: rejection-sampling SFT
+└── 06_stage5_distillation.ipynb          # Stage 5: distillation into smaller students
+# Checkpoints: cold_start.pt, after_grpo.pt, after_reject_sft.pt
 
-presentation/        # Slides
-scripts/             # Utility scripts (comparison charts, decision trees)
+presentation/        # Slide decks (markdown sources + rendered PDFs)
+scripts/             # Demo apps (app1_math_comparator, app2_logic_solver, app3_planning_agent)
 requirements/        # Dependencies
 ```
 
@@ -22,7 +25,7 @@ requirements/        # Dependencies
 **OpenAI (Responses API)**
 ```python
 client.responses.create(
-    model="gpt-5.2",
+    model="gpt-5.5",
     reasoning={"effort": "medium"},  # none/low/medium/high/xhigh
     input=[{"role": "developer", "content": "..."}, {"role": "user", "content": "..."}]
 )

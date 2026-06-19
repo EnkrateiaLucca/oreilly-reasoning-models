@@ -1,7 +1,7 @@
 """
 Math Reasoning Comparator - Side-by-side comparison of standard vs reasoning LLMs.
 
-Compares GPT-5.2 with reasoning=none (standard) against GPT-5.2 with reasoning=high,
+Compares GPT-5.5 with reasoning=none (standard) against GPT-5.5 with reasoning=high,
 showing the thinking process and performance metrics.
 
 Uses the OpenAI Responses API for optimal reasoning model performance.
@@ -75,7 +75,7 @@ def init_client():
 
 def call_standard_model(client: OpenAI, problem: str) -> dict:
     """
-    Call GPT-5.2 with reasoning effort=none (fast, pattern-based response).
+    Call GPT-5.5 with reasoning effort=none (fast, pattern-based response).
 
     Uses the Responses API for consistency with the reasoning model.
     Returns dict with: answer, tokens, latency, thinking
@@ -83,7 +83,7 @@ def call_standard_model(client: OpenAI, problem: str) -> dict:
     start_time = time.time()
 
     response = client.responses.create(
-        model="gpt-5.2",
+        model="gpt-5.5",
         reasoning={"effort": "none"},
         input=[
             {
@@ -111,7 +111,7 @@ def call_standard_model(client: OpenAI, problem: str) -> dict:
 
 def call_reasoning_model(client: OpenAI, problem: str, effort: str = "high") -> dict:
     """
-    Call GPT-5.2 with reasoning effort enabled (slower, with chain-of-thought).
+    Call GPT-5.5 with reasoning effort enabled (slower, with chain-of-thought).
 
     Uses the Responses API with reasoning summary to expose the thinking process.
     Reasoning models perform better without "think step by step" instructions.
@@ -121,7 +121,7 @@ def call_reasoning_model(client: OpenAI, problem: str, effort: str = "high") -> 
     start_time = time.time()
 
     response = client.responses.create(
-        model="gpt-5.2",
+        model="gpt-5.5",
         reasoning={"effort": effort, "summary": "auto"},
         input=[
             {
@@ -258,7 +258,7 @@ def main():
     st.sidebar.header("Settings")
 
     # Model info
-    st.sidebar.markdown("**Model:** `gpt-5.2`")
+    st.sidebar.markdown("**Model:** `gpt-5.5`")
     st.sidebar.markdown("**Comparison:**")
     st.sidebar.markdown("- Standard: `reasoning.effort=none`")
     st.sidebar.markdown("- Reasoning: `reasoning.effort=high`")

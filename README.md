@@ -14,16 +14,18 @@ This course explores how modern reasoning models (OpenAI o-series, DeepSeek R1, 
 - The five-stage R1 recipe: pretraining → cold-start SFT → RL (GRPO) → rejection-sampling SFT → distillation
 - GRPO (Group Relative Policy Optimization) implemented from scratch
 - When to use reasoning models vs. traditional LLMs
-- Reasoning across the OpenAI, Anthropic, and DeepSeek ecosystems
+- Hands-on with the DeepSeek R1 mechanism (the from-scratch pipeline) and OpenAI reasoning-model demo apps; Anthropic/Claude extended thinking is covered conceptually in the slides
 
 ## Repository Structure
 
 ```
 notebooks/      # Hands-on notebooks building the R1 training pipeline from scratch
 presentation/   # Slide decks (markdown sources + rendered PDFs)
-scripts/        # Demo apps and comparison/decision-chart utilities
+scripts/        # Demo apps showcasing reasoning-model use cases
 requirements/   # Python dependencies
 ```
+
+> **Quick reference:** A one-page cheatsheet is available at [`oreilly-reasoning-models-cheatsheet.html`](oreilly-reasoning-models-cheatsheet.html) (or the print-ready [`.pdf`](oreilly-reasoning-models-cheatsheet.pdf)).
 
 ### Notebooks (`notebooks/`)
 
@@ -50,15 +52,13 @@ Three decks (markdown source + PDF):
 ### Scripts (`scripts/`)
 
 - `app1_math_comparator/`, `app2_logic_solver/`, `app3_planning_agent/` — demo apps showcasing reasoning-model use cases
-- `reasoning_llms_decision_chart.py` — decision tree for picking a reasoning model
-- `llm_model_comparison.py` — quick model comparison utility
 
 ## Getting Started
 
 ### Prerequisites
 
-- OpenAI API key
-- Anthropic API key
+- OpenAI API key (required — used by the notebooks and demo apps)
+- Anthropic API key (optional — not used by any notebook or app; Claude is covered conceptually in the slides)
 - Python 3.11 or higher (for local setup only)
 
 ### Option 1: GitHub Codespaces (Recommended)
@@ -74,7 +74,7 @@ GitHub Codespaces provides a ready-to-use development environment in your browse
 
 #### Step 2: Set Up Your API Keys
 
-You'll need API keys from OpenAI and Anthropic to run the notebooks. Choose one of the following options:
+You'll need an OpenAI API key to run the notebooks and demo apps. An Anthropic API key is optional (no notebook or app uses it). Choose one of the following options:
 
 **Option A: GitHub Secrets (Recommended)**
 
@@ -91,7 +91,7 @@ This method securely stores your keys and auto-injects them into every Codespace
    - After creating the secret, click the secret name to edit it
    - Under "Repository access", select this repository (`oreilly-reasoning-models`)
    - Without this step, the secret won't be available in your Codespace
-6. Repeat steps 4-5 for `ANTHROPIC_API_KEY`
+6. (Optional) Repeat steps 4-5 for `ANTHROPIC_API_KEY` if you want to experiment with Claude on your own
 
 After adding secrets with repository access, restart your Codespace for them to take effect.
 
@@ -148,7 +148,7 @@ If you prefer to run locally instead of using GitHub Codespaces:
    **Option A: Environment variables**
    ```bash
    export OPENAI_API_KEY='your-openai-key-here'
-   export ANTHROPIC_API_KEY='your-anthropic-key-here'
+   export ANTHROPIC_API_KEY='your-anthropic-key-here'  # optional
    ```
 
    **Option B: Environment file**

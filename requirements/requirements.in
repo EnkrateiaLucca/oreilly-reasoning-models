@@ -1,9 +1,10 @@
 ipykernel
 openai>=2.0.0
-anthropic
-docling
 matplotlib
 pandas
 python-dotenv
 pydantic
 streamlit
+torch
+transformers
+numpy

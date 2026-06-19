@@ -1,10 +1,10 @@
 # Math Reasoning Comparator
 
-A Streamlit app that compares standard vs reasoning LLMs on math problems side-by-side.
+A Streamlit app that compares low vs high reasoning effort on math problems side-by-side.
 
 ## Features
 
-- Dual-panel display comparing GPT-4o (standard) vs o3-mini (reasoning)
+- Dual-panel display comparing GPT-5.5 with reasoning effort `none` (fast, standard) vs GPT-5.5 with reasoning effort `high` (thorough, chain-of-thought)
 - Pre-loaded math problems across three difficulty levels
 - Custom problem input support
 - Real-time streaming responses
@@ -45,5 +45,7 @@ streamlit run app.py
 
 ## Models Used
 
-- **Standard Model**: GPT-4o - Fast, capable general-purpose model
-- **Reasoning Model**: o3-mini - Specialized reasoning model with explicit thinking process
+Both panels use **GPT-5.5** via the Responses API, differing only in reasoning effort:
+
+- **Standard (fast)**: GPT-5.5 with `reasoning.effort = none` - no chain-of-thought, pattern-based answer
+- **Reasoning (thorough)**: GPT-5.5 with `reasoning.effort = high` - explicit chain-of-thought thinking process
