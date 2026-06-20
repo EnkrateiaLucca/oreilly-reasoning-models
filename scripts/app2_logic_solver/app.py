@@ -1,7 +1,7 @@
 """
 Logic Puzzle Solver & Explainer
 A Streamlit app that solves logic puzzles with visible chain-of-thought reasoning.
-Uses OpenAI's GPT-5.2 with reasoning effort via the Responses API.
+Uses OpenAI's GPT-5.5 with reasoning effort via the Responses API.
 """
 
 import json
@@ -86,7 +86,7 @@ Solve this puzzle step by step, showing your reasoning for each deduction. Then 
 
 def solve_puzzle(puzzle: dict, reasoning_effort: str = "high") -> tuple[dict, str, float, dict]:
     """
-    Solve a puzzle using GPT-5.2 with reasoning effort.
+    Solve a puzzle using GPT-5.5 with reasoning effort.
 
     Returns:
         Tuple of (solution_dict, reasoning_text, solve_time, usage_info)
@@ -98,9 +98,9 @@ def solve_puzzle(puzzle: dict, reasoning_effort: str = "high") -> tuple[dict, st
 
     start_time = time.time()
 
-    # Use GPT-5.2 with reasoning effort and summary
+    # Use GPT-5.5 with reasoning effort and summary
     response = client.responses.create(
-        model="gpt-5.2",
+        model="gpt-5.5",
         reasoning={"effort": reasoning_effort, "summary": "auto"},
         input=[
             {"role": "developer", "content": system_prompt},
@@ -213,7 +213,7 @@ def display_difficulty_chart(puzzle: dict, solve_time: float, usage_info: dict):
 
 def main():
     st.title("Logic Puzzle Solver & Explainer")
-    st.markdown("*Powered by OpenAI GPT-5.2 with reasoning capabilities*")
+    st.markdown("*Powered by OpenAI GPT-5.5 with reasoning capabilities*")
 
     # Sidebar
     st.sidebar.header("Puzzle Selection")
@@ -226,7 +226,7 @@ def main():
         "Reasoning Effort",
         options=["none", "low", "medium", "high", "xhigh"],
         value="high",
-        help="Controls how much 'thinking' GPT-5.2 does (none=fastest, xhigh=most thorough)"
+        help="Controls how much 'thinking' GPT-5.5 does (none=fastest, xhigh=most thorough)"
     )
 
     puzzle = None
@@ -380,7 +380,7 @@ def main():
     # Footer
     st.markdown("---")
     st.caption(
-        "Built with Streamlit and OpenAI GPT-5.2 | "
+        "Built with Streamlit and OpenAI GPT-5.5 | "
         "Part of the O'Reilly Reasoning Models Course"
     )
 
