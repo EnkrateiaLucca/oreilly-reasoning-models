@@ -47,7 +47,7 @@ def get_critique_schema_json() -> str:
 
 def generate_plan(client: OpenAI, goal: str, model: str, effort: str) -> tuple[Optional[Plan], str, str]:
     """
-    Generate a structured plan for the given goal using GPT-5.2 with reasoning.
+    Generate a structured plan for the given goal using GPT-5.5 with reasoning.
 
     Returns:
         Tuple of (Plan object or None, raw response, thinking content)
@@ -103,7 +103,7 @@ def generate_plan(client: OpenAI, goal: str, model: str, effort: str) -> tuple[O
 
 def generate_critique(client: OpenAI, plan: Plan, model: str, effort: str) -> tuple[Optional[Critique], str, str]:
     """
-    Generate a critique of the given plan using GPT-5.2 with reasoning.
+    Generate a critique of the given plan using GPT-5.5 with reasoning.
 
     Returns:
         Tuple of (Critique object or None, raw response, thinking content)
@@ -307,12 +307,12 @@ def main():
     with st.sidebar:
         st.header("Configuration")
 
-        # Model selector (GPT-5.2 only for reasoning)
+        # Model selector (GPT-5.5 only for reasoning)
         model = st.selectbox(
             "Model",
-            ["gpt-5.2"],
+            ["gpt-5.5"],
             index=0,
-            help="GPT-5.2 with adaptive reasoning"
+            help="GPT-5.5 with adaptive reasoning"
         )
 
         # Reasoning effort

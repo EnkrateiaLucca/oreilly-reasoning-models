@@ -31,7 +31,7 @@ def direct_vs_thinking():
     fig, axes = plt.subplots(1, 2, figsize=(11, 5))
     for ax in axes:
         ax.set_xticks([]); ax.set_yticks([])
-    axes[0].set_title("GPT-4 — direct answer", fontsize=13, fontweight="bold")
+    axes[0].set_title("gpt-5.5 (low effort) — direct answer", fontsize=13, fontweight="bold")
     axes[0].text(0.05, 0.9,
         "Q: A train leaves Lisbon at 3pm\n"
         "   going 80 km/h. Another leaves\n"
@@ -41,7 +41,7 @@ def direct_vs_thinking():
         family="monospace", va="top", fontsize=11)
     for s in axes[0].spines.values(): s.set_edgecolor("#bbb")
 
-    axes[1].set_title("o1 / R1 — with <think> trace", fontsize=13, fontweight="bold")
+    axes[1].set_title("gpt-5.5 (high effort) / R1 — with <think> trace", fontsize=13, fontweight="bold")
     axes[1].text(0.05, 0.95,
         "<think>\n"
         " Distance Lisbon↔Porto ≈ 300 km.\n"
@@ -60,21 +60,22 @@ def direct_vs_thinking():
 
 # ---------- 01: timeline ----------
 def timeline():
-    """Curated reasoning-model milestones, Sep 2024 → Sep 2025.
-    Labels stagger above/below the line to fit 10 entries legibly.
+    """Curated reasoning-model milestones, Sep 2024 → Apr 2026.
+    Labels stagger above/below the line to fit 11 entries legibly.
     """
     fig, ax = plt.subplots(figsize=(15, 5.5))
     events = [
         ("2024-09", "OpenAI\no1-preview",   "first public\nreasoning model"),
-        ("2024-11", "Qwen\nQwQ-32B",        "first open\nreasoning weights"),
         ("2025-01", "DeepSeek\nR1",         "open recipe\n@ o1 level"),
-        ("2025-02", "xAI\nGrok 3",          "\"Think\" mode"),
         ("2025-02", "Claude\n3.7 Sonnet",   "hybrid\nthinking toggle"),
         ("2025-03", "Gemini\n2.5 Pro",      "thinking\nbuilt-in"),
         ("2025-04", "OpenAI\no3 / o4-mini", "tools inside\nthe reasoning loop"),
-        ("2025-04", "Qwen3",                "open hybrid\nthinking family"),
-        ("2025-06", "Mistral\nMagistral",   "first European\nreasoning model"),
         ("2025-08", "OpenAI\nGPT-5",        "unified router\n(fast + think)"),
+        ("2025-11", "Gemini\n3.0",          "frontier\nmultimodal reasoning"),
+        ("2026-04", "OpenAI\nGPT-5.5",      "current flagship\n(adds xhigh)"),
+        ("2026-04", "Claude\nOpus 4.7",     "extended thinking\n+ self-checking"),
+        ("2026-04", "DeepSeek\nV4",         "open recipe\nstill scaling"),
+        ("2026-04", "Gemini\n3.1 Pro",      "frontier\nreasoning refresh"),
     ]
     n = len(events)
     xs = np.arange(n)
@@ -102,38 +103,61 @@ def timeline():
     ax.set_ylim(-1.7, 1.7)
     ax.set_xlim(-0.8, n - 0.2)
     ax.axis("off")
-    ax.set_title("The reasoning-model wave  ·  Sep 2024 → Aug 2025",
+    ax.set_title("The reasoning-model wave  ·  Sep 2024 → Apr 2026",
                  fontsize=15, fontweight="bold", pad=18)
     save(fig, "01_timeline.png")
 
 
 # ---------- 01: decision chart ----------
 def decision_chart():
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.set_xlim(0, 10); ax.set_ylim(0, 8); ax.axis("off")
-    ax.set_title("When to reach for a reasoning model", fontsize=14, fontweight="bold")
+    """A balanced top-down decision tree. Each decision node sits centered
+    over its two children; rows are evenly spaced; branch labels are lifted
+    off the connectors. (Title lives on the slide, not in the figure.)"""
+    fig, ax = plt.subplots(figsize=(13, 6.6))
+    ax.set_xlim(0, 13); ax.set_ylim(0, 9); ax.axis("off")
 
-    def box(x, y, w, h, text, color="#e8f0ff", edge="#5b8def"):
-        ax.add_patch(mpatches.FancyBboxPatch((x, y), w, h,
-            boxstyle="round,pad=0.1", fc=color, ec=edge, lw=1.8))
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=10)
+    BOX_W, BOX_H = 3.0, 1.2
+    STYLES = {  # face, edge
+        "decision": ("#e8f0ff", "#5b8def"),
+        "leaf":     ("#eaf4ff", "#5b8def"),
+        "stop":     ("#f0f0f0", "#8a8a8a"),
+    }
 
-    def arrow(x1, y1, x2, y2, label=""):
+    def node(cx, cy, text, kind="decision"):
+        fc, ec = STYLES[kind]
+        ax.add_patch(mpatches.FancyBboxPatch(
+            (cx - BOX_W / 2, cy - BOX_H / 2), BOX_W, BOX_H,
+            boxstyle="round,pad=0.1", fc=fc, ec=ec, lw=1.8))
+        ax.text(cx, cy, text, ha="center", va="center", fontsize=10.5)
+
+    def link(parent, child, label, side):
+        x1, y1 = parent[0], parent[1] - BOX_H / 2
+        x2, y2 = child[0], child[1] + BOX_H / 2
         ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
-                    arrowprops=dict(arrowstyle="->", lw=1.5, color="#555"))
-        if label:
-            ax.text((x1 + x2) / 2 + 0.15, (y1 + y2) / 2, label, fontsize=9, color="#555")
+                    arrowprops=dict(arrowstyle="-|>", lw=1.7, color="#666",
+                                    shrinkA=3, shrinkB=3))
+        ax.text((x1 + x2) / 2 + side * 0.5, (y1 + y2) / 2, label,
+                ha="center", va="center", fontsize=10.5, color="#444",
+                fontweight="bold",
+                bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="none"))
 
-    box(3.5, 6.5, 3, 1, "Task needs\nmulti-step reasoning?")
-    box(0.3, 4, 3, 1, "Vanilla LLM\n+ step-by-step", color="#f0f0f0", edge="#888")
-    box(6.7, 4, 3, 1, "Latency-critical?")
-    box(4.2, 1.8, 3, 1, "Low effort\n(o1-mini / R1-Distill)")
-    box(7.3, 0.3, 2.5, 1, "Full reasoning\n(o1 / R1)")
+    # Symmetric tree: children mirror their parent at each branch.
+    q1   = (6.5, 7.7)
+    van  = (3.5, 4.6)
+    q2   = (9.5, 4.6)
+    low  = (7.7, 1.5)
+    full = (11.3, 1.5)
 
-    arrow(4.5, 6.5, 2.3, 5.0, "no")
-    arrow(6.0, 6.5, 8.0, 5.0, "yes")
-    arrow(7.5, 4.0, 6.0, 2.8, "yes")
-    arrow(8.8, 4.0, 8.5, 1.3, "no")
+    node(*q1,  "Task needs\nmulti-step reasoning?")
+    node(*van, "Vanilla LLM\n+ step-by-step", kind="stop")
+    node(*q2,  "Latency- or\ncost-critical?")
+    node(*low, "Low effort\ngpt-5.5 low · o4-mini", kind="leaf")
+    node(*full, "Full reasoning\ngpt-5.5 high · o3\nClaude thinking · R1", kind="leaf")
+
+    link(q1, van,  "no",  -1)
+    link(q1, q2,   "yes", +1)
+    link(q2, low,  "yes", -1)
+    link(q2, full, "no",  +1)
     save(fig, "01_decision_chart.png")
 
 

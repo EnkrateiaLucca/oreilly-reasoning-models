@@ -57,9 +57,10 @@ A: Let's think step by step.
 
 ## When to reach for a reasoning model
 
-![w:850](assets/01_decision_chart.png)
+![w:760](assets/01_decision_chart.png)
 
 Math · code · planning · multi-constraint puzzles.
+*Which* model? → run `scripts/reasoning_model_selector.py`
 
 ---
 
@@ -71,7 +72,7 @@ Math · code · planning · multi-constraint puzzles.
 
 ## Reasoning effort knobs
 
-- **OpenAI:** `reasoning_effort = none / low / medium / high`
+- **OpenAI:** `reasoning_effort = none / low / medium / high / xhigh`
 - **Anthropic:** `thinking.budget_tokens = N`
 
 ---

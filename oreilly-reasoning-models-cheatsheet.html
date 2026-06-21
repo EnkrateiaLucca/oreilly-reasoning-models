@@ -358,7 +358,7 @@
     <div class="page-header">
         <h1>Working with OpenAI &amp; Anthropic Reasoning Models</h1>
         <div class="subtitle">O'Reilly Live Training — Quick Reference Cheatsheet</div>
-        <div class="meta">Lucas Soares &nbsp;|&nbsp; GPT-5.2 · Claude Extended Thinking · DeepSeek R1 &nbsp;|&nbsp; 2026</div>
+        <div class="meta">Lucas Soares &nbsp;|&nbsp; GPT-5.5 · Claude Extended Thinking · DeepSeek R1 &nbsp;|&nbsp; 2026</div>
     </div>
 
     <!-- SECTION 1: What is a Reasoning Model -->
@@ -626,7 +626,7 @@ print(response.output_text)</code></pre>
 client = anthropic.Anthropic()
 
 response = client.messages.create(
-    model="claude-opus-4-7",
+    model="claude-opus-4-8",
     max_tokens=16000,
     thinking={
         "type": "enabled",
@@ -658,7 +658,7 @@ response = client.messages.create(
         <div class="code-card">
             <div class="code-card-header">Anthropic — Streaming Extended Thinking</div>
             <pre><code>with client.messages.stream(
-    model="claude-opus-4-7",
+    model="claude-opus-4-8",
     max_tokens=16000,
     thinking={"type":"enabled","budget_tokens":8000},
     messages=[{"role":"user","content":problem}]
@@ -782,7 +782,7 @@ response = client.messages.create(
             <div class="card-content">
                 <ul>
                     <li>LLM-as-a-Judge framework</li>
-                    <li>Compare GPT-4o, GPT-5.2, Claude Sonnet 4.5</li>
+                    <li>Compare GPT-4o, GPT-5.5, Claude Sonnet 4.6</li>
                     <li>Pydantic structured evaluation</li>
                     <li>Cost analysis with 2026 pricing</li>
                     <li>PDF-to-markdown conversion</li>
@@ -793,7 +793,7 @@ response = client.messages.create(
             <div class="card-title">openai-thinking-parameters.ipynb</div>
             <div class="card-content">
                 <ul>
-                    <li>GPT-5.2 Responses API deep-dive</li>
+                    <li>GPT-5.5 Responses API deep-dive</li>
                     <li>Reasoning effort levels (none→xhigh)</li>
                     <li>Verbosity control (independent)</li>
                     <li>Tool use + web search integration</li>
