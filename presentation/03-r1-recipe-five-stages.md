@@ -96,3 +96,5 @@ A 2-layer student matches a `gpt2` teacher at a fraction of the params.
 | Distill | Efficiency |
 
 That is the whole R1 recipe.
+
+This same recipe — GRPO + RL from verifiable rewards — is still how 2026 frontier reasoning models (GPT-5.5, Claude Opus 4.7, Gemini 3.1) are trained: scaled, not replaced.

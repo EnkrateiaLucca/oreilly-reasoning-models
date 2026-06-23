@@ -1,6 +1,6 @@
 # Logic Puzzle Solver & Explainer
 
-A Streamlit application that solves logic puzzles using OpenAI's o3-mini reasoning model with visible chain-of-thought reasoning.
+A Streamlit application that solves logic puzzles using OpenAI's GPT-5.5 with reasoning effort (low vs high) and visible chain-of-thought reasoning.
 
 ## Features
 
@@ -46,7 +46,7 @@ A Streamlit application that solves logic puzzles using OpenAI's o3-mini reasoni
 ## API Usage
 
 This app uses:
-- **o3-mini**: For puzzle solving with reasoning capabilities
+- **GPT-5.5**: For puzzle solving with reasoning effort (adjustable low/medium/high)
 - **gpt-4o-mini**: For constraint verification (lightweight checks)
 
 ## File Structure
