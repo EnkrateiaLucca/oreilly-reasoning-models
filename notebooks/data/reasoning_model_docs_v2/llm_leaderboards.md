@@ -1,0 +1,10 @@
+- [Chatbot Arena (LMSYS)](https://lmarena.ai) — human-preference Elo ratings from blind head-to-head comparisons
+- [Open LLM Leaderboard (Hugging Face)](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard) — primary ranking for open-source models
+- [Artificial Analysis LLM Leaderboard](https://artificialanalysis.ai/leaderboards/models) — compares quality, speed, cost, and context window
+- [SEAL Leaderboard (Scale AI)](https://scale.com/leaderboard) — expert-driven evaluations across coding, math, and instruction following
+- [LiveBench](https://livebench.ai) — contamination-free benchmark with monthly-refreshed questions
+- [SWE-bench](https://www.swebench.com) — benchmark for coding agents solving real GitHub issues
+- [EvalPlus Leaderboard](https://evalplus.github.io/leaderboard.html) — code generation quality (HumanEval+ and MBPP+)
+- [AlpacaEval Leaderboard](https://tatsu-lab.github.io/alpaca_eval) — instruction-following quality via LLM-as-judge
+- [Berkeley Function-Calling Leaderboard](https://gorilla.cs.berkeley.edu/leaderboard.html) — evaluates tool/function-calling accuracy
+- [Vellum LLM Leaderboard](https://www.vellum.ai/llm-leaderboard) — aggregates benchmark scores from official technical reports

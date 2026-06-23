@@ -1,0 +1,7 @@
+Key principles for writing high-quality tools by Anthropic:
+- Choosing the right tools to implement (and not to implement)
+	- ['increase the surface area' of the tools's capabilities](https://www.anthropic.com/engineering/writing-tools-for-agents#:~:text=Occasionally%2C%20an%20agent,grasp%20as%20humans.)
+- [Namespacing tools to define clear boundaries in functionality](https://www.anthropic.com/engineering/writing-tools-for-agents#:~:text=Namespacing%20your%20tools,from%20your%20tools)
+- [Returning meaningful context from tools back to agents](https://www.anthropic.com/engineering/writing-tools-for-agents#:~:text=Returning%20meaningful%20context%20from%20your,to%20control%20tool%20response%20verbosity%3A)
+- [Optimizing tool responses for token efficiency](https://www.anthropic.com/engineering/writing-tools-for-agents#:~:text=your%20own%20evaluation.-,Optimizing%20tool%20responses%20for%20token%20efficiency,specific%20and%20actionable%20improvements%2C%20rather%20than%20opaque%20error%20codes%20or%20tracebacks.,-Here%E2%80%99s%20an%20example)
+- [Prompt-engineering tool descriptions and specs](https://www.anthropic.com/engineering/writing-tools-for-agents#:~:text=formatted%20tool%20inputs.-,Prompt-engineering%20your%20tool,Looking%20ahead,-To%20build%20effective)

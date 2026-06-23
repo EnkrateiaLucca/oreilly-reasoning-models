@@ -9,3 +9,6 @@ streamlit
 torch
 transformers
 numpy
+scikit-learn
+anthropic
+google-genai

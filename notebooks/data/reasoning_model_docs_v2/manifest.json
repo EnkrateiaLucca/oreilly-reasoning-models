@@ -1,0 +1,134 @@
+[
+  {
+    "file": "start_incrementally_on_your_llm_task.md",
+    "source_title": "Start incrementally on your LLM task",
+    "chars": 219,
+    "lines": 6
+  },
+  {
+    "file": "notes_on_llm_evaluation.md",
+    "source_title": "notes on llm evaluation",
+    "chars": 850,
+    "lines": 15
+  },
+  {
+    "file": "llm_as_judge_suggestions.md",
+    "source_title": "suggestions for LLM as judge pattern",
+    "chars": 1181,
+    "lines": 7
+  },
+  {
+    "file": "evaluate_prompts_like_finance_product.md",
+    "source_title": "lesson raw - Evaluate Prompts Like a Finance Product Small Test Sets",
+    "chars": 788,
+    "lines": 19
+  },
+  {
+    "file": "twelve_factors_for_building_agents.md",
+    "source_title": "12 Factors for building agents",
+    "chars": 3765,
+    "lines": 109
+  },
+  {
+    "file": "agentic_workflows.md",
+    "source_title": "Agentic Workflows",
+    "chars": 1130,
+    "lines": 24
+  },
+  {
+    "file": "what_can_you_do_with_llm_agents.md",
+    "source_title": "What Can You Do with LLM Agents?",
+    "chars": 10375,
+    "lines": 135
+  },
+  {
+    "file": "project_openai_agentkit_responses_api.md",
+    "source_title": "Project - OpenAI AgentKit & Responses API",
+    "chars": 556,
+    "lines": 13
+  },
+  {
+    "file": "controlling_the_thinking_budget.md",
+    "source_title": "controlling the thinking budget",
+    "chars": 1341,
+    "lines": 13
+  },
+  {
+    "file": "reasoning_token_pricing.md",
+    "source_title": "reasoning token pricing",
+    "chars": 1047,
+    "lines": 14
+  },
+  {
+    "file": "chain_of_thought_as_test_time_compute.md",
+    "source_title": "chain-of-thought as test-time compute",
+    "chars": 1146,
+    "lines": 14
+  },
+  {
+    "file": "reasoning_benchmarks.md",
+    "source_title": "reasoning benchmarks",
+    "chars": 1106,
+    "lines": 19
+  },
+  {
+    "file": "llm_leaderboards.md",
+    "source_title": "LLM LeaderBoards",
+    "chars": 1244,
+    "lines": 11
+  },
+  {
+    "file": "prompting_reasoning_models.md",
+    "source_title": "prompting reasoning models",
+    "chars": 1640,
+    "lines": 14
+  },
+  {
+    "file": "system_2_thinking.md",
+    "source_title": "System 2 thinking",
+    "chars": 742,
+    "lines": 14
+  },
+  {
+    "file": "grpo.md",
+    "source_title": "GRPO",
+    "chars": 1342,
+    "lines": 23
+  },
+  {
+    "file": "kl_regularization_rl_finetuning.md",
+    "source_title": "KL regularization in RL fine-tuning",
+    "chars": 1012,
+    "lines": 18
+  },
+  {
+    "file": "neural_nets_that_can_reason.md",
+    "source_title": "neural_nets_that_can_reason",
+    "chars": 453,
+    "lines": 8
+  },
+  {
+    "file": "writing_mcp_tools_for_llm_agents.md",
+    "source_title": "writing mcp tools for LLM agents",
+    "chars": 1281,
+    "lines": 7
+  },
+  {
+    "file": "evaluation_of_llm_agents.md",
+    "source_title": "Evaluation of LLM Agents",
+    "chars": 1540,
+    "lines": 29
+  },
+  {
+    "file": "sample_principles_good_llm_agents_anthropic.md",
+    "source_title": "Sample principles for good LLM agent implementations from anthropic",
+    "chars": 944,
+    "lines": 13
+  },
+  {
+    "file": "types_of_data_to_connect_with_llms.md",
+    "source_title": "The types of data to connect with Large Language Models",
+    "chars": 868,
+    "lines": 5
+  }
+]

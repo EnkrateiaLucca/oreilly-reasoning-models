@@ -1,0 +1,4 @@
+here's great interest in seamlessly connecting natural language with diverse types of data (structured, unstructured, and semi-structured). But, this emerging "LUI" (language user interface) has specific challenges/considerations for each data type:
+Structured Data: Predominantly housed within SQL or Graph databases, structured data is characterized by predefined schemas and organized in tables or relations, making it amenable to precise query operations.
+Semi-structured Data: Semi-structured data blends structured elements (e.g., tables in a document or relational database) with unstructured elements (e.g., text or an embedding column in a relational database).
+Unstructured Data: Typically stored in vector databases, unstructured data consists of information without a predefined model, frequently accompanied by structured metadata that enables filtering.
