@@ -6,95 +6,110 @@ title: Module 3 — The R1 Recipe in Code
 ---
 
 # The R1 Recipe in Code
-### Module 3 — Five stages, five tiny notebooks
+### Module 3 — Five stages, three notebooks
 
-One toy task — adding two small integers — runs through every stage.
-Watch the same metric improve.
-
----
-
-## Stage 1 — Pre-training
-
-> Predict the next token. That's it.
+One toy task — **1-digit addition** — runs through every stage.
+We watch **one number** climb the whole way: the task **pass-rate**.
 
 ---
 
-## Demo →
+## The map: 5 stages → 3 notebooks
 
-`02_stage1_pretraining.ipynb`
+| Notebook | Stages it covers | The point |
+|---|---|---|
+| **01 · Foundations** | base model + why a scratchpad helps | intermediate tokens *measurably* help |
+| **02 · The RL core** | cold-start SFT → GRPO | teach the format, then reward correctness |
+| **03 · Amplify & compress** | rejection-SFT → distillation | self-improve, then shrink |
 
-A 2-layer transformer learns tinyshakespeare in 200 steps.
-
----
-
-## Stage 2 — Cold-start SFT
-
-> Teach the format: `<think>…</think><answer>…</answer>`.
+> Each notebook runs top-to-bottom on a **laptop CPU** in minutes.
 
 ---
 
-## Demo →
+## Notebook 01 — Foundations
 
-`03_stage2_cold_start_sft.ipynb`
+> Every reasoning model starts as a plain **next-token predictor**.
 
-Fine-tune `gpt2` on 20 hand-written examples.
+Then the key experiment: train two tiny models on addition —
+one answers **directly**, one gets a **`<think>` scratchpad**.
 
----
-
-## Stage 3 — RL with GRPO
-
-> Sample G completions, reward correct ones, push the model toward the group's best.
-
-No critic. No human labels. Just a checker.
+`notebooks/01_foundations_reasoning_and_cot.ipynb`
 
 ---
 
-## Demo →
+## The insight that justifies the whole course
 
-`04_stage3_rl_grpo_from_scratch.ipynb`
+The scratchpad model wins.
 
-GRPO in ~60 lines of PyTorch on 1-digit addition.
-
----
-
-## Stage 4 — Rejection-sampling SFT
-
-> Use the RL'd model as a data factory: generate, filter, fine-tune.
+> Intermediate tokens aren't decoration — they're **computation**.
+> That single result is *why* reasoning models exist.
 
 ---
 
-## Demo →
+## Notebook 02 — The RL core (1/2): Cold-start SFT
 
-`05_stage4_rejection_sampling_sft.ipynb`
+> Teach the **format** first: `<think>…</think><answer>…</answer>`.
 
-Pass-rate jumps again with no new training signal — just better data.
-
----
-
-## Stage 5 — Distillation
-
-> Compress the recipe into a smaller model with KL on logits.
+A handful of examples locks in the shape — answers still mostly wrong.
+Pass-rate: low single digits. That's expected.
 
 ---
 
-## Demo →
+## Notebook 02 — The RL core (2/2): GRPO
 
-`06_stage5_distillation.ipynb`
+> Sample the same prompt **G times**, score each by rule, push toward the group's best.
 
-A 2-layer student matches a `gpt2` teacher at a fraction of the params.
+No critic. No value network. No human labels — **the group is the baseline**.
+Watch the pass-rate climb.
+
+`notebooks/02_rl_core_coldstart_sft_and_grpo.ipynb`
 
 ---
 
-## Recap
+## Notebook 03 — Amplify (1/2): Rejection-sampling SFT
 
-| Stage | What it adds |
-|---|---|
-| Pre-train | Language |
-| Cold-start | Format |
-| RL (GRPO) | Skill |
-| Reject-SFT | Stability |
-| Distill | Efficiency |
+> Use the RL'd model as a **data factory**: generate → keep only correct → fine-tune.
 
-That is the whole R1 recipe.
+The pass-rate jumps again with **no new training signal** — just better data.
 
-This same recipe — GRPO + RL from verifiable rewards — is still how 2026 frontier reasoning models (GPT-5.5, Claude Opus 4.7, Gemini 3.1) are trained: scaled, not replaced.
+---
+
+## Notebook 03 — Compress (2/2): Distillation
+
+> Pour the skill into a **smaller student** with KL on the logits.
+
+A model ~**1/7 the size** keeps most of the pass-rate.
+
+`notebooks/03_amplify_and_compress_rejection_sft_and_distillation.ipynb`
+
+---
+
+## The payoff — one metric, the whole recipe
+
+| Stage | What it adds | Pass-rate |
+|---|---|---|
+| Cold-start | format | ▁ |
+| GRPO | skill | ▃ |
+| Reject-SFT | stability | ▅ |
+| Distill | efficiency | ▅ (smaller) |
+
+> *(Exact numbers print live in the notebook — that's the demo.)*
+
+---
+
+## This is still how it's done
+
+The same recipe — **GRPO + RL from verifiable rewards** — is how 2026 frontier
+reasoning models (GPT-5.5, Claude Opus 4.8, Gemini 3.x) are trained.
+
+> Scaled up massively. **Not replaced.**
+
+---
+
+## Bonus → picking & proving in practice
+
+- `notebooks/07_picking_a_reasoning_model_for_an_application.ipynb`
+  a multi-provider bake-off with an LLM judge
+- `notebooks/08_reproducibility_cheap_vs_flagship.ipynb`
+  fix a **seed**, match a flagship with a **cheaper** model, count the cost
+
+> The training story, then the **engineering** story.

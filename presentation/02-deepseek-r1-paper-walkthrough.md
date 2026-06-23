@@ -18,6 +18,32 @@ arxiv.org/pdf/2501.12948
 
 ---
 
+## How do you train a model to *think*?
+
+You don't write the reasoning for it. You **incentivize** it:
+
+- Show a few examples of **thinking through** a problem (cold-start)
+- Then **reward** the behavior you want with RL:
+  - did it get the answer **right**? (accuracy)
+  - did it use the **`<think>` markers**? (format)
+  - did it **stay in one language**? (consistency)
+
+> No human writes the chains. The model discovers them.
+
+---
+
+## The trick: verifiable rewards
+
+For math and code you can **check the answer automatically** —
+no learned reward model, no human rater in the loop.
+
+- Math → compare to the parsed ground-truth number
+- Code → run the **unit tests**
+
+> A cheap, unhackable signal is what makes pure-RL reasoning possible.
+
+---
+
 ## R1-Zero vs R1
 
 - **R1-Zero:** pure RL on a base model, no SFT. Works — but ugly outputs.

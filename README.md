@@ -29,17 +29,19 @@ requirements/   # Python dependencies
 
 ### Notebooks (`notebooks/`)
 
-Walks through the full R1-style reasoning-model training pipeline:
+Walks through the full R1-style reasoning-model training pipeline. The five-stage recipe is
+consolidated into **three runnable, CPU-friendly notebooks**, each carrying one metric — the task
+**pass-rate** on a toy 1-digit-addition task — so you watch the same number climb the whole way:
 
 - `00_setup_check.ipynb` — verify environment and API keys
-- `01_chain_of_thought_intuition.ipynb` — what CoT is and why it works
-- `02_stage1_pretraining.ipynb` — Stage 1: base-model pretraining
-- `03_stage2_cold_start_sft.ipynb` — Stage 2: cold-start supervised fine-tuning
-- `04_stage3_rl_grpo_from_scratch.ipynb` — Stage 3: GRPO reinforcement learning, implemented from scratch
-- `05_stage4_rejection_sampling_sft.ipynb` — Stage 4: rejection-sampling SFT on RL outputs
-- `06_stage5_distillation.ipynb` — Stage 5: distilling the reasoning model into smaller students
+- `01_foundations_reasoning_and_cot.ipynb` — what a reasoning LLM is, CoT as test-time compute, and the capstone experiment: a scratchpad beats answering directly (measured locally)
+- `02_rl_core_coldstart_sft_and_grpo.ipynb` — cold-start SFT (teach the `<think>`/`<answer>` format) then GRPO from scratch (no critic, no human labels)
+- `03_amplify_and_compress_rejection_sft_and_distillation.ipynb` — rejection-sampling SFT (self-generated data) then distillation into a ~7× smaller student
+- `07_picking_a_reasoning_model_for_an_application.ipynb` — a multi-provider model bake-off with an LLM judge
+- `08_reproducibility_cheap_vs_flagship.ipynb` — fix a seed and show a cheaper model (DeepSeek V4 Pro) can match a flagship at a fraction of the cost (runs in mock mode without API keys)
 
-Checkpoint files (`cold_start.pt`, `after_grpo.pt`, `after_reject_sft.pt`) let you jump into any stage without re-running prior ones.
+Shared machinery lives in `r1_toy.py`. The original five single-stage notebooks are preserved under
+`notebooks/archive/`.
 
 ### Presentation (`presentation/`)
 
@@ -47,7 +49,7 @@ Three decks (markdown source + PDF):
 
 - `01-intro-reasoning-llms` — intro to reasoning LLMs and the landscape
 - `02-deepseek-r1-paper-walkthrough` — guided walkthrough of the DeepSeek R1 paper
-- `03-r1-recipe-five-stages` — overview of the five-stage R1 recipe mirrored by the notebooks
+- `03-r1-recipe-five-stages` — the five-stage R1 recipe mapped onto the three technical notebooks
 
 ### Scripts (`scripts/`)
 
@@ -65,7 +67,7 @@ Three decks (markdown source + PDF):
 ### Prerequisites
 
 - OpenAI API key (required — used by the notebooks and demo apps)
-- Anthropic API key (optional — not used by any notebook or app; Claude is covered conceptually in the slides)
+- Anthropic / Google / DeepSeek API keys (optional — the model bake-off notebooks `07` and `08` use whichever keys are present; `08` also runs fully in mock mode with no keys)
 - Python 3.11 or higher (for local setup only)
 
 ### Option 1: GitHub Codespaces (Recommended)
@@ -81,7 +83,7 @@ GitHub Codespaces provides a ready-to-use development environment in your browse
 
 #### Step 2: Set Up Your API Keys
 
-You'll need an OpenAI API key to run the notebooks and demo apps. An Anthropic API key is optional (no notebook or app uses it). Choose one of the following options:
+You'll need an OpenAI API key to run the core notebooks and demo apps. Anthropic / Google / DeepSeek keys are optional — the bake-off notebooks `07` and `08` use whichever are present. Choose one of the following options:
 
 **Option A: GitHub Secrets (Recommended)**
 
