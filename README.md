@@ -20,12 +20,13 @@ This course explores how modern reasoning models (OpenAI o-series, DeepSeek R1, 
 
 ```
 notebooks/      # Hands-on notebooks building the R1 training pipeline from scratch
-presentation/   # Slide decks (markdown sources + rendered PDFs)
+presentation/   # Remark.js slide deck (presentation.html) + rendered PDF
 scripts/        # Demo apps showcasing reasoning-model use cases
 requirements/   # Python dependencies
+assets/         # Course handouts (quick-reference cheatsheet)
 ```
 
-> **Quick reference:** A one-page cheatsheet is available at [`oreilly-reasoning-models-cheatsheet.html`](oreilly-reasoning-models-cheatsheet.html) (or the print-ready [`.pdf`](oreilly-reasoning-models-cheatsheet.pdf)).
+> **Quick reference:** A one-page cheatsheet is available at [`assets/oreilly-reasoning-models-cheatsheet.html`](assets/oreilly-reasoning-models-cheatsheet.html) (or the print-ready [`.pdf`](assets/oreilly-reasoning-models-cheatsheet.pdf)).
 
 ### Notebooks (`notebooks/`)
 
@@ -37,29 +38,41 @@ consolidated into **three runnable, CPU-friendly notebooks**, each carrying one 
 - `01_foundations_reasoning_and_cot.ipynb` — what a reasoning LLM is, CoT as test-time compute, and the capstone experiment: a scratchpad beats answering directly (measured locally)
 - `02_rl_core_coldstart_sft_and_grpo.ipynb` — cold-start SFT (teach the `<think>`/`<answer>` format) then GRPO from scratch (no critic, no human labels)
 - `03_amplify_and_compress_rejection_sft_and_distillation.ipynb` — rejection-sampling SFT (self-generated data) then distillation into a ~7× smaller student
-- `07_picking_a_reasoning_model_for_an_application.ipynb` — a multi-provider model bake-off with an LLM judge
-- `08_reproducibility_cheap_vs_flagship.ipynb` — fix a seed and show a cheaper model (DeepSeek V4 Pro) can match a flagship at a fraction of the cost (runs in mock mode without API keys)
+- `04_picking_a_reasoning_model_for_an_application.ipynb` — a multi-provider model bake-off with an LLM judge
+- `05_reproducibility_cheap_vs_flagship.ipynb` — fix a seed and show a cheaper model (DeepSeek V4 Pro) can match a flagship at a fraction of the cost (runs in mock mode without API keys)
+
+Provider deep-dives — hands-on with each provider's reasoning controls, standalone (not part of the pass-rate arc, but the practical half of "working with OpenAI and Anthropic reasoning models"):
+
+- `provider_anthropic_extended_thinking.ipynb` — hands-on with Claude extended thinking (`thinking.budget_tokens` and `output_config.effort`)
+- `provider_openai_thinking_parameters.ipynb` — hands-on with OpenAI's `reasoning.effort` parameter across levels
 
 Shared machinery lives in `r1_toy.py`. The original five single-stage notebooks are preserved under
 `notebooks/archive/`.
 
 ### Presentation (`presentation/`)
 
-Three decks (markdown source + PDF):
+A single Remark.js deck (`presentation.html`, exported to `presentation.pdf`), covering all three modules:
 
-- `01-intro-reasoning-llms` — intro to reasoning LLMs and the landscape
-- `02-deepseek-r1-paper-walkthrough` — guided walkthrough of the DeepSeek R1 paper
-- `03-r1-recipe-five-stages` — the five-stage R1 recipe mapped onto the three technical notebooks
+- **Intro to Reasoning LLMs** — what they are, why now
+- **The DeepSeek R1 Paper** — reading the recipe
+- **The R1 Recipe in Code** — the five-stage recipe mapped onto the three technical notebooks
+
+Open `presentation.html` directly in a browser to present.
 
 ### Scripts (`scripts/`)
 
 - `app1_math_comparator/`, `app2_logic_solver/`, `app3_planning_agent/` — demo apps showcasing reasoning-model use cases
-- `reasoning_model_selector.py` — a runnable decision aid for *choosing* a current reasoning model (gpt-5.5, the o-series, Claude extended thinking, DeepSeek R1). Prints a comparison + recommends one from a task profile; `--weights` ranks the models by a score you control (reasoning/speed/cost); `--chart` saves the comparison image to `presentation/assets/` (alongside the deck images). Pairs with the deck-01 "When to reach for a reasoning model" flowchart.
+- `reasoning_model_selector.py` — a runnable decision aid for *choosing* a current reasoning model (gpt-5.6, the o-series, Claude extended thinking, DeepSeek R1). Prints a comparison + recommends one from a task profile; `--weights` ranks the models by a score you control (reasoning/speed/cost); `--chart` saves the comparison image to `presentation/assets/` (alongside the deck images). Pairs with the deck-01 "When to reach for a reasoning model" flowchart.
 
   ```bash
   python scripts/reasoning_model_selector.py                       # comparison + sample picks
   python scripts/reasoning_model_selector.py --weights 0.5,0.3,0.2 # weighted ranking: reasoning,speed,cost
   python scripts/reasoning_model_selector.py --chart               # also save the chart PNG
+  ```
+- `reasoning_explorer.py` — a local web app that shows OpenAI Responses-API reasoning summaries and Anthropic extended-thinking blocks side by side, so you can inspect intermediate reasoning traces from both providers on the same prompt.
+
+  ```bash
+  uv run scripts/reasoning_explorer.py   # open http://localhost:8765
   ```
 
 ## Getting Started
@@ -67,7 +80,7 @@ Three decks (markdown source + PDF):
 ### Prerequisites
 
 - OpenAI API key (required — used by the notebooks and demo apps)
-- Anthropic / Google / DeepSeek API keys (optional — the model bake-off notebooks `07` and `08` use whichever keys are present; `08` also runs fully in mock mode with no keys)
+- Anthropic / Google / DeepSeek API keys (optional — the model bake-off notebooks `04` and `05` use whichever keys are present; `05` also runs fully in mock mode with no keys)
 - Python 3.11 or higher (for local setup only)
 
 ### Option 1: GitHub Codespaces (Recommended)
@@ -83,7 +96,7 @@ GitHub Codespaces provides a ready-to-use development environment in your browse
 
 #### Step 2: Set Up Your API Keys
 
-You'll need an OpenAI API key to run the core notebooks and demo apps. Anthropic / Google / DeepSeek keys are optional — the bake-off notebooks `07` and `08` use whichever are present. Choose one of the following options:
+You'll need an OpenAI API key to run the core notebooks and demo apps. Anthropic / Google / DeepSeek keys are optional — the bake-off notebooks `04` and `05` use whichever are present. Choose one of the following options:
 
 **Option A: GitHub Secrets (Recommended)**
 

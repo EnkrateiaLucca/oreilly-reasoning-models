@@ -10,7 +10,7 @@ answers the next question — *which* current reasoning model, and why.
 
 It does three things:
   1. Prints a side-by-side comparison of the reasoning models this course
-     covers (OpenAI gpt-5.5, the o-series, Claude extended thinking, DeepSeek R1).
+     covers (OpenAI gpt-5.6, the o-series, Claude extended thinking, DeepSeek R1).
   2. Recommends one from a short task profile, with a transparent rule it
      prints alongside the pick — so students can see *and edit* the logic.
   3. Optionally ranks the models by a weighted score you control
@@ -20,8 +20,9 @@ It does three things:
 
 Numbers here are qualitative tiers (low / med / high), not benchmark claims.
 The point is how to choose, not a leaderboard — a single hardcoded score
-table rots the moment a model ships. Model facts are current as of 2026-06
-(see research/openai-model-currency.md and the deck-01 timeline).
+table rots the moment a model ships. Model facts are current as of 2026-08
+(see research/openai-model-currency.md, research/fable5-kimik3-integration.md,
+and the deck-01 timeline).
 
 Run:
     python scripts/reasoning_model_selector.py                      # comparison + sample picks
@@ -54,17 +55,17 @@ class ReasoningModel:
     best_for: str
 
 
-# Current reasoning models the course covers (2026-06).
+# Current reasoning models the course covers (2026-08).
 MODELS: list[ReasoningModel] = [
     ReasoningModel(
-        name="gpt-5.5",
+        name="gpt-5.6",
         provider="OpenAI",
-        effort_control="reasoning.effort = none|low|medium|high|xhigh",
+        effort_control="reasoning.effort = none|low|medium|high|xhigh|max",
         reasoning=3, latency=2, cost=2, open_weights=False,
         best_for="balanced default — dial effort to fit the task",
     ),
     ReasoningModel(
-        name="o4-mini",
+        name="gpt-5.6-luna",
         provider="OpenAI",
         effort_control="reasoning.effort (compact)",
         reasoning=2, latency=1, cost=1, open_weights=False,
@@ -78,18 +79,32 @@ MODELS: list[ReasoningModel] = [
         best_for="hardest problems; runs tools mid-reasoning",
     ),
     ReasoningModel(
-        name="Claude Opus 4.7 (extended thinking)",
+        name="Claude Opus 5",
         provider="Anthropic",
-        effort_control="thinking.budget_tokens = N",
+        effort_control="output_config.effort = low|medium|high|xhigh|max",
         reasoning=3, latency=2, cost=3, open_weights=False,
         best_for="long, self-checking reasoning + strong writing",
+    ),
+    ReasoningModel(
+        name="Claude Fable 5",
+        provider="Anthropic",
+        effort_control="output_config.effort (always-on — can't disable thinking)",
+        reasoning=3, latency=3, cost=3, open_weights=False,
+        best_for="highest available capability; cost/latency not the constraint",
+    ),
+    ReasoningModel(
+        name="Kimi K3",
+        provider="Moonshot AI",
+        effort_control="reasoning_effort = low|high|max (always-on)",
+        reasoning=3, latency=2, cost=2, open_weights=True,
+        best_for="open-weight frontier reasoning at ~1/2 Fable 5's price",
     ),
     ReasoningModel(
         name="DeepSeek R1",
         provider="DeepSeek",
         effort_control="always-on <think> (open recipe)",
         reasoning=3, latency=2, cost=1, open_weights=True,
-        best_for="open weights — self-host or study the mechanism",
+        best_for="open weights — self-host or study the mechanism this course rebuilds",
     ),
 ]
 
@@ -98,6 +113,7 @@ MODELS: list[ReasoningModel] = [
 class TaskProfile:
     """What the task actually demands. Toggle these to change the pick."""
     needs_deep_reasoning: bool = True
+    needs_max_capability: bool = False  # stakes are high enough that cost/latency don't matter
     latency_sensitive: bool = False
     cost_sensitive: bool = False
     needs_open_weights: bool = False   # self-host / on-prem / inspect the recipe
@@ -112,21 +128,27 @@ def recommend(task: TaskProfile) -> tuple[str, str]:
     fits wins, so the most constraining requirements are checked first.
     """
     if not task.needs_deep_reasoning:
-        return ("Vanilla LLM — or gpt-5.5 at effort=none/low",
+        return ("Vanilla LLM — or gpt-5.6 at effort=none/low",
                 "single-step task: don't pay the reasoning tax (5-50x tokens)")
+    if task.needs_max_capability:
+        return ("Claude Fable 5",
+                "highest available capability; cost/latency isn't the constraint "
+                "(note: thinking is always-on here — there's no disabling it)")
     if task.needs_open_weights:
         return ("DeepSeek R1",
-                "only open-weights reasoner here — self-host / inspect the recipe")
+                "only open-weights reasoner this course rebuilds end-to-end — "
+                "self-host / inspect the recipe (Kimi K3 is also open-weight "
+                "and newer/stronger; see the comparison table)")
     if task.needs_tools_in_loop:
         return ("OpenAI o3",
                 "needs tools running inside the reasoning loop")
     if task.cost_sensitive or task.latency_sensitive:
-        return ("OpenAI o4-mini — or gpt-5.5 at effort=low",
+        return ("OpenAI gpt-5.6-luna — or gpt-5.6 at effort=low",
                 "cost/latency-bound: cheapest fast step-by-step")
     if task.writing_heavy:
-        return ("Claude Opus 4.7 (extended thinking)",
+        return ("Claude Opus 5",
                 "long, self-checking output — budget thinking tokens")
-    return ("gpt-5.5 at effort=medium/high",
+    return ("gpt-5.6 at effort=medium/high",
             "deep reasoning, no special constraint: the balanced default")
 
 
@@ -164,6 +186,8 @@ def rank(weights: tuple[float, float, float]) -> list[tuple[ReasoningModel, floa
 SAMPLE_TASKS: list[tuple[str, TaskProfile]] = [
     ("Summarize a short email",
      TaskProfile(needs_deep_reasoning=False)),
+    ("Board-level go/no-go call, cost is not a factor",
+     TaskProfile(needs_max_capability=True)),
     ("Grade 50k math solutions overnight",
      TaskProfile(cost_sensitive=True)),
     ("Multi-step research agent that browses + runs code",
@@ -179,7 +203,7 @@ SAMPLE_TASKS: list[tuple[str, TaskProfile]] = [
 
 def print_comparison() -> None:
     print(DIVIDER)
-    print("Reasoning models this course covers (current as of 2026-06)")
+    print("Reasoning models this course covers (current as of 2026-08)")
     print(DIVIDER)
     header = (f"{'Model':<36} {'Provider':<10} {'Reasoning':<10} "
               f"{'Latency':<8} {'Cost':<6} {'Open?':<6}")

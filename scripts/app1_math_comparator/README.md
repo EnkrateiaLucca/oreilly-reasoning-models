@@ -4,7 +4,7 @@ A Streamlit app that compares low vs high reasoning effort on math problems side
 
 ## Features
 
-- Dual-panel display comparing GPT-5.5 with reasoning effort `none` (fast, standard) vs GPT-5.5 with reasoning effort `high` (thorough, chain-of-thought)
+- Dual-panel display comparing GPT-5.6 with reasoning effort `none` (fast, standard) vs GPT-5.6 with reasoning effort `high` (thorough, chain-of-thought)
 - Pre-loaded math problems across three difficulty levels
 - Custom problem input support
 - Real-time streaming responses
@@ -45,7 +45,7 @@ streamlit run app.py
 
 ## Models Used
 
-Both panels use **GPT-5.5** via the Responses API, differing only in reasoning effort:
+Both panels use **GPT-5.6** via the Responses API, differing only in reasoning effort:
 
-- **Standard (fast)**: GPT-5.5 with `reasoning.effort = none` - no chain-of-thought, pattern-based answer
-- **Reasoning (thorough)**: GPT-5.5 with `reasoning.effort = high` - explicit chain-of-thought thinking process
+- **Standard (fast)**: GPT-5.6 with `reasoning.effort = none` - no chain-of-thought, pattern-based answer
+- **Reasoning (thorough)**: GPT-5.6 with `reasoning.effort = high` - explicit chain-of-thought thinking process

@@ -219,7 +219,7 @@ def timeline_2026(events=None):
     ax.set_ylim(-2.05, 2.05)
     ax.set_xlim(-0.8, n - 0.2)
     ax.axis("off")
-    ax.set_title("The reasoning-model wave  ·  Sep 2024 → mid 2026",
+    ax.set_title("The reasoning-model wave  ·  Sep 2024 → Aug 2026",
                  fontsize=17, fontweight="bold", pad=16)
     save(fig, "timeline_2026.png")
 
@@ -254,9 +254,9 @@ def leaderboard_intelligence(data=None):
     leg = [mpatches.Patch(fc=SKY, ec=INK, label="proprietary"),
            mpatches.Patch(fc=SAGE, ec=INK, label="open-weights")]
     ax.legend(handles=leg, loc="lower right", fontsize=11, frameon=True)
-    ax.text(1.0, -0.075,
+    ax.text(1.0, -0.11,
             "Source: Artificial Analysis Intelligence Index style · "
-            "as of June 2026 · approximate, see notes",
+            "as of Aug 2026 (v4.1) · approximate, see notes",
             transform=ax.transAxes, ha="right", fontsize=9,
             color=G500, style="italic")
     save(fig, "leaderboard_intelligence.png")
@@ -278,6 +278,15 @@ def open_vs_proprietary(series=None):
     ax.plot(x, openw, "-s", color=SAGE, lw=3, ms=9, mec=INK, mew=1.4,
             label="best open-weights")
     ax.fill_between(x, openw, prop, color=GOLDEN_L, alpha=0.7, zorder=0)
+    # flag the methodology break before a trailing "(v4.1)"-labeled point —
+    # that point is on a different index scale and not time-comparable to
+    # the earlier quarters, so mark it rather than let it read as a trend.
+    if len(quarters) >= 2 and "v4.1" in quarters[-1]:
+        xb = x[-1] - 0.5
+        ax.axvline(xb, color=G600, lw=1.6, ls=(0, (4, 3)), zorder=1)
+        ax.text(xb, max(max(prop), max(openw)) + 3,
+                "methodology break\n(AA Index v4.1)", ha="center",
+                va="bottom", fontsize=9, color=G600, style="italic")
     # gap annotations at first and last
     for idx in (0, len(x) - 1):
         gap = prop[idx] - openw[idx]
@@ -296,10 +305,10 @@ def open_vs_proprietary(series=None):
     for sp in ["top", "right"]:
         ax.spines[sp].set_visible(False)
     ax.legend(fontsize=12, loc="lower right", frameon=True)
-    ax.text(1.0, -0.12,
-            "Source: Artificial Analysis style intelligence scores · "
-            "as of June 2026 · approximate",
-            transform=ax.transAxes, ha="right", fontsize=9,
+    ax.text(1.0, -0.14,
+            "Source: Artificial Analysis style intelligence scores · as of Aug 2026 · approximate\n"
+            "Q3'26 (v4.1) point uses the new AA methodology — not directly comparable to earlier points",
+            transform=ax.transAxes, ha="right", va="top", fontsize=9,
             color=G500, style="italic")
     save(fig, "open_vs_proprietary.png")
 
@@ -483,29 +492,36 @@ def cot_paper_fig1():
 
 
 # ============================================================
-# DATA (June 2026 research — see PART B report)
+# DATA (August 2026 research — see research/leaderboard-standings-2026-08.md)
 # ============================================================
-# Artificial Analysis Intelligence Index (approximate, ~June 2026)
-# Composite score (~0-65 scale). Top values from AA articles; rest [approx].
+# Artificial Analysis Intelligence Index (approximate, ~Aug 2026, v4.1 methodology)
+# Composite score (~0-65 scale). v4.1 shipped 2026-06-15 ("shift toward agentic
+# workloads") — scores here are NOT on the same scale as the prior (pre-v4.1)
+# round; see GAP_SERIES note below. Top 9 rows are primary-sourced (AA articles /
+# AA launch posts); the 3 open-weights rows are secondary-aggregator-sourced
+# [unverified] but kept for open-vs-proprietary balance and continuity with the
+# timeline + GAP_SERIES (GLM-5.2) and the price-comparison slide (DeepSeek V4 Pro).
+# Dropped vs. the prior round: Claude Opus 4.6 and Grok 4.3 (both superseded by
+# newer models already in this list), plus Gemini 3.5 Flash/3.1 Pro, Claude Opus
+# 4.7, and MiniMax M3 (open) — trimmed for chart length, all [unverified] tier.
 LEADERBOARD = [
-    ("Claude Opus 4.8",        61.4, "p"),
-    ("GPT-5.5 (xhigh)",        60.2, "p"),
-    ("Claude Opus 4.7",        53.5, "p"),
-    ("GPT-5.4",                51.4, "p"),
-    ("GLM-5.2 (open)",         51.0, "o"),
-    ("Gemini 3.5 Flash",       50.2, "p"),
-    ("Gemini 3.1 Pro",         46.5, "p"),
-    ("Qwen 3.7 Max (open)",    46.0, "o"),
-    ("MiniMax M3 (open)",      44.4, "o"),
-    ("DeepSeek V4 Pro (open)", 44.3, "o"),
-    ("Claude Opus 4.6",        43.7, "p"),
-    ("Grok 4.3",               37.6, "p"),
+    ("Claude Opus 5",          61.0, "p"),
+    ("Claude Fable 5",         60.0, "p"),
+    ("GPT-5.6 Sol (max)",      59.0, "p"),
+    ("Kimi K3 (open)",         57.0, "o"),   # open-weight per research/fable5-kimik3-integration.md, corrects earlier "p" tag
+    ("Claude Opus 4.8 (max)",  56.0, "p"),
+    ("GPT-5.6 Terra (max)",    55.0, "p"),
+    ("Grok 4.5",               54.0, "p"),
+    ("Claude Sonnet 5",        53.0, "p"),
+    ("GLM-5.2 (open)",         51.1, "o"),   # [unverified — secondary aggregator]
+    ("GPT-5.6 Luna (max)",     51.0, "p"),
+    ("Qwen 3.7 Max (open)",    46.0, "o"),   # [unverified — secondary aggregator]
+    ("DeepSeek V4 Pro (open)", 44.0, "o"),   # [unverified — secondary aggregator]
 ]
 
 # chronological milestones for the timeline (date label, name, blurb)
 TIMELINE_EVENTS = [
     ("Sep 2024", "OpenAI\no1-preview",   "first public\nreasoning model"),
-    ("Dec 2024", "Gemini 2.0\nFlash Thinking", "Google's first\nthinking model"),
     ("Jan 2025", "DeepSeek\nR1",         "open recipe\n@ o1 level"),
     ("Feb 2025", "Claude\n3.7 Sonnet",   "hybrid thinking\ntoggle"),
     ("Mar 2025", "Gemini\n2.5 Pro",      "thinking\nbuilt-in"),
@@ -514,20 +530,30 @@ TIMELINE_EVENTS = [
     ("Aug 2025", "OpenAI\nGPT-5",        "unified router\n(fast + think)"),
     ("Nov 2025", "Gemini 3 Pro\n+ Opus 4.5", "frontier multimodal\nreasoning"),
     ("Apr 2026", "OpenAI\nGPT-5.5",      "briefly tops the\nAA index (xhigh)"),
-    ("Apr 2026", "DeepSeek\nV4 Pro",     "near-frontier,\n~1/34th the cost"),
-    ("May 2026", "Claude\nOpus 4.8",     "current AA leader\n(61.4)"),
+    ("Apr 2026", "DeepSeek\nV4 Pro",     "capable open-weights,\n~1/34th the cost"),
+    ("May 2026", "Claude\nOpus 4.8",     "AA leader at the\ntime (61.4)"),
     ("Jun 2026", "GLM-5.2\n(open)",      "top open-weights\nmodel (51)"),
+    ("Jun 2026", "Claude\nFable 5",      "top score (60),\nthinking can't disable"),
+    ("Jun 2026", "Claude\nSonnet 5",     "speed/intelligence\nbalance"),
+    ("Jul 2026", "GPT-5.6 +\nClaude Opus 5", "current\nflagships"),
+    ("Jul 2026", "Kimi K3\n(open)",      "open-weight frontier,\n~1/3 Fable 5's cost"),
 ]
 
 # closing-the-gap series: (quarter, best proprietary, best open-weights)
-# AA-style intelligence index; endpoints anchored to Opus 4.8 (61.4) vs
-# GLM-5.2 (51) -> ~10-pt gap, down from ~20-25 pts in late 2024 [approx]
+# AA-style intelligence index. Q4'24 - Q2'26 are on the pre-v4.1 scale,
+# anchored to Opus 4.8 (61.4) vs GLM-5.2 (51) -> ~10-pt gap, down from
+# ~20-25 pts in late 2024 [approx]. AA shipped Intelligence Index v4.1 on
+# 2026-06-15 (methodology shift, not a capability change) — rather than
+# naively appending a same-scale Q3'26 point, we add one v4.1-scale point
+# anchored to Claude Opus 5 (61) vs GLM-5.2 (51.1 rounded to 51) and flag
+# the break explicitly in the chart (see open_vs_proprietary()).
 GAP_SERIES = [
     ("Q4'24", 42, 18),
     ("Q1'25", 47, 30),
     ("Q3'25", 53, 41),
     ("Q1'26", 58, 47),
     ("Q2'26", 61, 51),
+    ("Q3'26 (v4.1)", 61, 51),
 ]
 
 

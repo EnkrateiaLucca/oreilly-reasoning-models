@@ -147,7 +147,7 @@ INDEX_HTML = r"""<!doctype html>
     <div class="controls-oai show">
       <label>Model</label>
       <select id="oai-model">
-        <option>gpt-5.2</option>
+        <option>gpt-5.6</option>
         <option>o4-mini</option>
         <option>o3</option>
       </select>
@@ -162,8 +162,8 @@ INDEX_HTML = r"""<!doctype html>
     <div class="controls-anth">
       <label>Model</label>
       <select id="anth-model">
-        <option>claude-sonnet-4-5-20250929</option>
-        <option>claude-opus-4-5</option>
+        <option>claude-sonnet-5</option>
+        <option>claude-opus-5</option>
       </select>
       <label>Thinking budget (tokens)</label>
       <input id="anth-budget" type="number" value="5000" min="1024" step="1000" />
@@ -294,13 +294,13 @@ class Handler(BaseHTTPRequestHandler):
             if provider == "openai":
                 if not os.getenv("OPENAI_API_KEY"):
                     return self._send_json(400, {"error": "OPENAI_API_KEY not set"})
-                result = call_openai(prompt, req.get("model", "gpt-5.2"), req.get("effort", "medium"))
+                result = call_openai(prompt, req.get("model", "gpt-5.6"), req.get("effort", "medium"))
             elif provider == "anthropic":
                 if not os.getenv("ANTHROPIC_API_KEY"):
                     return self._send_json(400, {"error": "ANTHROPIC_API_KEY not set"})
                 result = call_anthropic(
                     prompt,
-                    req.get("model", "claude-sonnet-4-5-20250929"),
+                    req.get("model", "claude-sonnet-5"),
                     int(req.get("budget", 5000)),
                 )
             else:

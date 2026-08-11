@@ -358,7 +358,7 @@
     <div class="page-header">
         <h1>Working with OpenAI &amp; Anthropic Reasoning Models</h1>
         <div class="subtitle">O'Reilly Live Training — Quick Reference Cheatsheet</div>
-        <div class="meta">Lucas Soares &nbsp;|&nbsp; GPT-5.5 · Claude Extended Thinking · DeepSeek R1 &nbsp;|&nbsp; 2026</div>
+        <div class="meta">Lucas Soares &nbsp;|&nbsp; GPT-5.6 · Claude Extended Thinking · DeepSeek R1 &nbsp;|&nbsp; 2026</div>
     </div>
 
     <!-- SECTION 1: What is a Reasoning Model -->
@@ -408,14 +408,14 @@
 
     <div class="grid-3">
         <div class="card">
-            <div class="card-title">OpenAI o-series</div>
+            <div class="card-title">OpenAI gpt-5.6 family</div>
             <div class="card-content">
                 <ul>
-                    <li>o1, o3, o4-mini</li>
+                    <li>gpt-5.6-sol / -terra / -luna (intelligence → cost/latency)</li>
                     <li>Proprietary, API-only</li>
-                    <li>Reasoning effort: <code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code></li>
+                    <li>Reasoning effort: <code>none</code>/<code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code>/<code>max</code></li>
                     <li>Responses API (stateful)</li>
-                    <li>Vision support (o1+)</li>
+                    <li>Vision support (native)</li>
                 </ul>
             </div>
         </div>
@@ -423,11 +423,11 @@
             <div class="card-title">Anthropic Claude</div>
             <div class="card-content">
                 <ul>
-                    <li>Claude 4 Opus/Sonnet</li>
-                    <li>Extended Thinking mode</li>
-                    <li>Budget tokens: 1K–32K+</li>
-                    <li>Interleaved thinking (Beta)</li>
-                    <li>Summarized thinking (Claude 4+)</li>
+                    <li>Claude Opus 5 / Sonnet 5</li>
+                    <li>Adaptive thinking (on by default) + <code>output_config.effort</code></li>
+                    <li>Effort: <code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code>/<code>max</code></li>
+                    <li>Haiku 4.5: classic <code>thinking.budget_tokens</code> only</li>
+                    <li>Summarized thinking via <code>display: "summarized"</code></li>
                 </ul>
             </div>
         </div>
@@ -473,7 +473,7 @@
                 <li>Content generation at volume</li>
                 <li>Low-latency interactive applications</li>
                 <li>Routing, summarization, triage</li>
-                <li>o-series planner → GPT "doer" steps</li>
+                <li>gpt-5.6-sol planner → gpt-5.6-luna "doer" steps</li>
             </ul>
         </div>
     </div>
@@ -501,7 +501,7 @@
                     <li><strong>Document Analysis</strong> — contracts, financial statements, legal</li>
                     <li><strong>Code</strong> — debugging, architecture, one-shotting entire files</li>
                     <li><strong>Decision Support</strong> — financial analysis, risk assessment</li>
-                    <li><strong>Agentic Workflows</strong> — o-series plans, GPT executes</li>
+                    <li><strong>Agentic Workflows</strong> — gpt-5.6-sol plans, gpt-5.6-luna executes</li>
                     <li><strong>Research</strong> — hypothesis testing, paper synthesis</li>
                     <li><strong>Visual Reasoning</strong> — architectural drawings, dense charts</li>
                 </ul>
@@ -562,7 +562,7 @@
 
     <div class="grid-2">
         <div class="card">
-            <div class="card-title">OpenAI o-series (o1, o3, o4-mini)</div>
+            <div class="card-title">OpenAI gpt-5.6 (sol / terra / luna)</div>
             <div class="card-content">
                 <ul>
                     <li><strong>Write briefs, not prompts</strong> — 10× more context than you think</li>
@@ -572,31 +572,31 @@
                     <li><strong>Use delimiters</strong> — markdown, XML tags, section titles</li>
                     <li><strong>Zero-shot first</strong>, then few-shot if needed</li>
                     <li><strong>Define success criteria</strong> — let model self-evaluate</li>
-                    <li><strong>Developer messages</strong> (not system messages) for o1-2024-12-17+</li>
-                    <li><strong>Reasoning effort API</strong>: <code>none</code> / <code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code></li>
+                    <li><strong>Developer messages</strong> (not system messages)</li>
+                    <li><strong>Reasoning effort API</strong>: <code>none</code> / <code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code> / <code>max</code></li>
                     <li><strong>Responses API</strong> with <code>store=true</code> for multi-turn + tool calls</li>
                 </ul>
             </div>
         </div>
         <div class="card">
-            <div class="card-title">Anthropic Claude Extended Thinking</div>
+            <div class="card-title">Anthropic Claude (Opus 5 / Sonnet 5)</div>
             <div class="card-content">
                 <ul>
-                    <li><strong>Budget tokens</strong> — control depth: 1K (quick) → 32K+ (deep)</li>
+                    <li><strong>Effort</strong> — <code>output_config.effort</code>: low → xhigh → max, default high</li>
+                    <li><strong>Adaptive thinking</strong> — on by default; no config needed to reason</li>
                     <li><strong>Start minimal</strong> — don't say "think step by step" (redundant)</li>
                     <li><strong>Streaming required</strong> for large outputs (improves UX)</li>
                     <li><strong>Tool use</strong>: set <code>tool_choice: auto</code></li>
-                    <li><strong>Interleaved thinking</strong> — Beta, Claude 4 models only</li>
-                    <li><strong>Summarized thinking</strong> — Claude 4+ returns summary; billed for full tokens</li>
+                    <li><strong>Summarized thinking</strong> — opt in with <code>display: "summarized"</code> (defaults to omitted)</li>
                     <li><strong>Show progress</strong> — stream thinking blocks to reduce perceived latency</li>
-                    <li><strong>Complex tasks</strong> — increase budget progressively, don't start at max</li>
+                    <li><strong>Haiku 4.5</strong> — no effort/adaptive support; use classic <code>budget_tokens</code></li>
                 </ul>
             </div>
         </div>
     </div>
 
     <div class="info-box mb-small">
-        <div class="info-box-title">Key Mental Model: o1 is a "Report Generator", not a Chat Model</div>
+        <div class="info-box-title">Key Mental Model: gpt-5.6 is a "Report Generator", not a Chat Model</div>
         <p>Treat it like email, not texting. Give full context upfront (company background, schemas, code, constraints). Ask for one specific output. Define what "good" looks like. It will one-shot entire files — but won't iteratively chat its way to a solution.</p>
     </div>
 
@@ -605,12 +605,12 @@
 
     <div class="grid-2">
         <div class="code-card">
-            <div class="code-card-header">OpenAI — Responses API (o3)</div>
+            <div class="code-card-header">OpenAI — Responses API (gpt-5.6)</div>
             <pre><code>from openai import OpenAI
 client = OpenAI()
 
 response = client.responses.create(
-    model="o3",
+    model="gpt-5.6",
     reasoning={"effort": "high"},
     input=[{
         "role": "user",
@@ -621,24 +621,22 @@ response = client.responses.create(
 print(response.output_text)</code></pre>
         </div>
         <div class="code-card">
-            <div class="code-card-header">Anthropic — Extended Thinking (Claude)</div>
+            <div class="code-card-header">Anthropic — Effort-based Reasoning (Claude Opus 5)</div>
             <pre><code>import anthropic
 client = anthropic.Anthropic()
 
 response = client.messages.create(
-    model="claude-opus-4-8",
+    model="claude-opus-5",
     max_tokens=16000,
-    thinking={
-        "type": "enabled",
-        "budget_tokens": 10000
-    },
+    output_config={"effort": "high"},
     messages=[{
         "role": "user",
         "content": "Your problem here..."
     }]
 )
-# Access thinking: response.content[0]
-# Access answer: response.content[1]</code></pre>
+# Thinking is on by default (adaptive); opt into seeing it with
+# thinking={"type": "adaptive", "display": "summarized"}
+print(response.content[-1].text)</code></pre>
         </div>
     </div>
 
@@ -646,7 +644,7 @@ response = client.messages.create(
         <div class="code-card">
             <div class="code-card-header">OpenAI — Streaming Reasoning</div>
             <pre><code>with client.responses.stream(
-    model="o3",
+    model="gpt-5.6",
     reasoning={"effort": "medium"},
     input=[{"role": "user", "content": brief}]
 ) as stream:
@@ -656,9 +654,9 @@ response = client.messages.create(
             print(event.delta, end="", flush=True)</code></pre>
         </div>
         <div class="code-card">
-            <div class="code-card-header">Anthropic — Streaming Extended Thinking</div>
+            <div class="code-card-header">Anthropic — Streaming Extended Thinking (Claude Haiku 4.5)</div>
             <pre><code>with client.messages.stream(
-    model="claude-opus-4-8",
+    model="claude-haiku-4-5-20251001",
     max_tokens=16000,
     thinking={"type":"enabled","budget_tokens":8000},
     messages=[{"role":"user","content":problem}]
@@ -667,11 +665,14 @@ response = client.messages.create(
         if event.type == "content_block_delta":
             # thinking_delta or text_delta
             print(event.delta)</code></pre>
+            <p style="font-size:7.5pt; color:#666; padding:0 8pt 6pt;">
+                <code>budget_tokens</code> is Haiku 4.5-only — Opus 5 / Sonnet 5 use adaptive
+                thinking + <code>output_config.effort</code> instead.</p>
         </div>
     </div>
 
-    <!-- SECTION 7: DeepSeek vs o1 -->
-    <div class="section-title">7. DeepSeek R1 vs OpenAI o1 — Comparison</div>
+    <!-- SECTION 7: DeepSeek vs gpt-5.6 -->
+    <div class="section-title">7. DeepSeek R1 vs OpenAI gpt-5.6 — Comparison</div>
 
     <div class="table-card mb-medium">
         <div class="table-card-header">Model Comparison</div>
@@ -680,7 +681,7 @@ response = client.messages.create(
                 <tr>
                     <th>Dimension</th>
                     <th>DeepSeek R1</th>
-                    <th>OpenAI o1/o3</th>
+                    <th>OpenAI gpt-5.6</th>
                 </tr>
             </thead>
             <tbody>
@@ -778,23 +779,23 @@ response = client.messages.create(
 
     <div class="grid-3">
         <div class="card-light">
-            <div class="card-title">analytical-framework.ipynb</div>
+            <div class="card-title">04_picking_a_reasoning_model_for_an_application.ipynb</div>
             <div class="card-content">
                 <ul>
                     <li>LLM-as-a-Judge framework</li>
-                    <li>Compare GPT-4o, GPT-5.5, Claude Sonnet 4.6</li>
+                    <li>Compare GPT-4o, GPT-5.6, Claude Sonnet 5, Claude Opus 5</li>
                     <li>Pydantic structured evaluation</li>
-                    <li>Cost analysis with 2026 pricing</li>
-                    <li>PDF-to-markdown conversion</li>
+                    <li>Pairs with <code>05_reproducibility_cheap_vs_flagship.ipynb</code> for cost analysis</li>
+                    <li>Multi-provider model bake-off</li>
                 </ul>
             </div>
         </div>
         <div class="card-light">
-            <div class="card-title">openai-thinking-parameters.ipynb</div>
+            <div class="card-title">provider_openai_thinking_parameters.ipynb</div>
             <div class="card-content">
                 <ul>
-                    <li>GPT-5.5 Responses API deep-dive</li>
-                    <li>Reasoning effort levels (none→xhigh)</li>
+                    <li>GPT-5.6 Responses API deep-dive</li>
+                    <li>Reasoning effort levels (none→max)</li>
                     <li>Verbosity control (independent)</li>
                     <li>Tool use + web search integration</li>
                     <li>Structured outputs with Pydantic</li>
@@ -802,13 +803,13 @@ response = client.messages.create(
             </div>
         </div>
         <div class="card-light">
-            <div class="card-title">anthropic-extended-thinking.ipynb</div>
+            <div class="card-title">provider_anthropic_extended_thinking.ipynb</div>
             <div class="card-content">
                 <ul>
-                    <li>Claude extended thinking setup</li>
-                    <li>Budget tokens tuning (1K–32K+)</li>
+                    <li>Claude Opus 5 / Sonnet 5 adaptive thinking</li>
+                    <li><code>output_config.effort</code> + classic <code>budget_tokens</code> (Haiku 4.5)</li>
                     <li>Streaming implementation</li>
-                    <li>Interleaved thinking (Beta)</li>
+                    <li>Summarized thinking display</li>
                     <li>Tool use with extended thinking</li>
                 </ul>
             </div>
@@ -822,15 +823,15 @@ response = client.messages.create(
         <div class="decision-box">
             <div style="font-weight:700; font-size:10pt; margin-bottom:6pt;">Model Selection Tree</div>
             <pre>Need reasoning model?
-├─ Speed &gt; accuracy? → GPT-4o / traditional LLM
+├─ Speed &gt; accuracy? → gpt-5.6-luna (effort=none) / traditional LLM
 ├─ Complex + ambiguous problem?
 │   ├─ Need on-premises? → DeepSeek R1 (self-host)
-│   ├─ Cost-sensitive? → Distilled model (32B)
-│   ├─ Best accuracy? → OpenAI o3 or Claude Opus
-│   └─ Vision needed? → OpenAI o1/o3
+│   ├─ Cost-sensitive? → gpt-5.6-luna / Distilled model (32B)
+│   ├─ Best accuracy? → gpt-5.6-sol (xhigh/max) or Claude Opus 5
+│   └─ Vision needed? → gpt-5.6-sol (native vision)
 └─ Agentic workflow?
-    ├─ Planner role → o-series / Claude Extended Thinking
-    └─ Executor role → GPT-4o / Claude Sonnet (fast)</pre>
+    ├─ Planner role → gpt-5.6 / Claude Opus 5 (extended thinking)
+    └─ Executor role → gpt-5.6-luna / Claude Sonnet 5 (fast)</pre>
         </div>
         <div class="card">
             <div class="card-title">Reasoning Effort Guidelines</div>
@@ -843,13 +844,14 @@ response = client.messages.create(
                     <tr><td style="padding:4pt 5pt; border-bottom:1px solid #eee;"><code>low</code></td><td style="padding:4pt 5pt; border-bottom:1px solid #eee;">Well-defined, structured tasks</td></tr>
                     <tr><td style="padding:4pt 5pt; border-bottom:1px solid #eee;"><code>medium</code></td><td style="padding:4pt 5pt; border-bottom:1px solid #eee;">Most standard complex problems</td></tr>
                     <tr><td style="padding:4pt 5pt; border-bottom:1px solid #eee;"><code>high</code></td><td style="padding:4pt 5pt; border-bottom:1px solid #eee;">Multi-doc analysis, hard math</td></tr>
-                    <tr><td style="padding:4pt 5pt;"><code>xhigh</code></td><td style="padding:4pt 5pt;">Maximum accuracy critical tasks</td></tr>
+                    <tr><td style="padding:4pt 5pt; border-bottom:1px solid #eee;"><code>xhigh</code></td><td style="padding:4pt 5pt; border-bottom:1px solid #eee;">Near-max accuracy, complex multi-step</td></tr>
+                    <tr><td style="padding:4pt 5pt;"><code>max</code></td><td style="padding:4pt 5pt;">Maximum reasoning, most complex tasks</td></tr>
                 </table>
                 <div style="margin-top:8pt; font-size:8.5pt;">
-                    <strong>Claude budget tokens:</strong><br>
-                    1K–2K = quick reasoning<br>
-                    8K–16K = standard complex tasks<br>
-                    32K+ = deep analysis, long documents
+                    <strong>Claude Opus 5 / Sonnet 5:</strong> use the effort table above
+                    (<code>output_config.effort</code>) — thinking is adaptive and on by default.<br>
+                    <strong>Claude Haiku 4.5 budget tokens</strong> (no effort support):
+                    1K–2K = quick · 8K–16K = standard · 32K+ = deep analysis
                 </div>
             </div>
         </div>
@@ -859,12 +861,12 @@ response = client.messages.create(
         <div class="key-points-title">Key Takeaways</div>
         <ul>
             <li><strong>Reasoning models</strong> trade speed for accuracy via internal CoT</li>
-            <li><strong>Write briefs</strong> for o-series — 10× context, clear goals, one output</li>
-            <li><strong>Budget tokens</strong> control Claude thinking depth (start minimal)</li>
+            <li><strong>Write briefs</strong> for gpt-5.6 — 10× context, clear goals, one output</li>
+            <li><strong>Effort / budget tokens</strong> control reasoning depth (start minimal)</li>
             <li><strong>Don't say</strong> "think step by step" — redundant for both APIs</li>
             <li><strong>DeepSeek R1</strong> is open-source, self-hostable, MIT licensed</li>
             <li><strong>Distilled models</strong> reach 80–95% of teacher model performance</li>
-            <li><strong>Planner + doer pattern</strong> — o-series plans, GPT executes</li>
+            <li><strong>Planner + doer pattern</strong> — gpt-5.6-sol plans, gpt-5.6-luna executes</li>
             <li><strong>Stream responses</strong> to manage latency expectations in production</li>
             <li><strong>Hybrid fallbacks</strong> — design for when reasoning fails or times out</li>
             <li><strong>Benchmark on YOUR domain</strong> — performance varies significantly by task type</li>
