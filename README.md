@@ -19,8 +19,10 @@ This course explores how modern reasoning models (OpenAI o-series, DeepSeek R1, 
 ## Repository Structure
 
 ```
-notebooks/      # Hands-on notebooks building the R1 training pipeline from scratch
+notebooks/      # Hands-on notebooks: build the R1 pipeline from scratch + the practical workflow
 presentation/   # Remark.js slide deck (presentation.html) + rendered PDF
+guide/          # Interactive HTML artifacts (paper walkthrough + training-overlay diagram)
+research/       # Sourced research notes behind the deck (when-to-use, selection, prompting, practical)
 scripts/        # Demo apps showcasing reasoning-model use cases
 requirements/   # Python dependencies
 assets/         # Course handouts (quick-reference cheatsheet)
@@ -30,32 +32,51 @@ assets/         # Course handouts (quick-reference cheatsheet)
 
 ### Notebooks (`notebooks/`)
 
-Walks through the full R1-style reasoning-model training pipeline. The five-stage recipe is
-consolidated into **three runnable, CPU-friendly notebooks**, each carrying one metric — the task
-**pass-rate** on a toy 1-digit-addition task — so you watch the same number climb the whole way:
+The whole five-stage R1 recipe is now built in **one runnable, CPU-friendly notebook** that walks
+down the DeepSeek-R1 paper in order, carrying a single metric — the task **pass-rate** on a toy
+1-digit-addition task — so you watch the same number climb through every stage:
 
 - `00_setup_check.ipynb` — verify environment and API keys
-- `01_foundations_reasoning_and_cot.ipynb` — what a reasoning LLM is, CoT as test-time compute, and the capstone experiment: a scratchpad beats answering directly (measured locally)
-- `02_rl_core_coldstart_sft_and_grpo.ipynb` — cold-start SFT (teach the `<think>`/`<answer>` format) then GRPO from scratch (no critic, no human labels)
-- `03_amplify_and_compress_rejection_sft_and_distillation.ipynb` — rejection-sampling SFT (self-generated data) then distillation into a ~7× smaller student
-- `04_picking_a_reasoning_model_for_an_application.ipynb` — a multi-provider model bake-off with an LLM judge
-- `05_reproducibility_cheap_vs_flagship.ipynb` — fix a seed and show a cheaper model (DeepSeek V4 Pro) can match a flagship at a fraction of the cost (runs in mock mode without API keys)
+- `01_build_a_reasoning_model_r1_from_scratch.ipynb` — the full pipeline in the paper's sequence:
+  foundations (a scratchpad beats a direct answer, measured locally) → base model → **R1-Zero**
+  (pure RL/GRPO on the base, verifiable rewards) → **cold-start SFT** (teach the `<think>`/`<answer>`
+  format) → **reasoning RL (GRPO)** from scratch (no critic, no human labels) → **rejection-sampling
+  SFT** (self-generated data) → **distillation** into a ~7× smaller student. Observed pass-rate arc:
+  ~2% → 8% → 19% → 28%, with the distilled student keeping most of it.
+- `02_reproducibility_cheap_vs_flagship.ipynb` — the **practical "working with reasoning models"**
+  notebook: fix a seed and show a cheaper model can match a flagship at a fraction of the cost, with a
+  real AI-engineer workflow (current `reasoning.effort` / adaptive-thinking + `effort` params, reasoning-token
+  cost accounting, truncation handling, an engineering best-practices checklist). Runs fully in mock
+  mode with no API keys.
 
-Provider deep-dives — hands-on with each provider's reasoning controls, standalone (not part of the pass-rate arc, but the practical half of "working with OpenAI and Anthropic reasoning models"):
+Provider deep-dives — hands-on with each provider's reasoning controls, standalone:
 
-- `provider_anthropic_extended_thinking.ipynb` — hands-on with Claude extended thinking (`thinking.budget_tokens` and `output_config.effort`)
+- `provider_anthropic_extended_thinking.ipynb` — hands-on with Claude extended/adaptive thinking (`output_config.effort`)
 - `provider_openai_thinking_parameters.ipynb` — hands-on with OpenAI's `reasoning.effort` parameter across levels
 
-Shared machinery lives in `r1_toy.py`. The original five single-stage notebooks are preserved under
-`notebooks/archive/`.
+Shared machinery lives in `r1_toy.py`. The earlier single-stage and consolidated notebooks (including
+the old model bake-off) are preserved under `notebooks/archive/`.
+
+### Interactive guides (`guide/`)
+
+- `reasoning-training-guide.html` — **Inside DeepSeek-R1**: a self-contained, interactive walkthrough
+  that merges a pedagogical explanation with the paper itself (R1-Zero vs R1, the multi-stage pipeline
+  stepper, GRPO, embedded paper figures). This is Section 2 of the deck. Open it directly in a browser.
+- `training-overlay.html` — a "two ways to train an LLM" diagram overlaying the traditional pipeline
+  (Llama 2: SFT + RLHF/PPO) against the reasoning pipeline (DeepSeek-R1: cold-start CoT SFT + GRPO with
+  verifiable rewards), so the differences are unmistakable.
 
 ### Presentation (`presentation/`)
 
-A single Remark.js deck (`presentation.html`, exported to `presentation.pdf`), covering all three modules:
+A single Remark.js deck (`presentation.html`, exported to `presentation.pdf`), in three sections:
 
-- **Intro to Reasoning LLMs** — what they are, why now
-- **The DeepSeek R1 Paper** — reading the recipe
-- **The R1 Recipe in Code** — the five-stage recipe mapped onto the three technical notebooks
+- **1. Foundations** — what reasoning LLMs are (with real chatbot screenshots), the 2026 landscape
+  (live Artificial Analysis rankings + open-vs-proprietary gap), when to use one, and how to prompt them
+- **2. The DeepSeek R1 Paper** — the interactive `guide/` walkthrough + the from-scratch notebook rebuilt
+  stage-by-stage, with demo/recap slides woven in
+- **3. Working with Reasoning Models** — 10 practical slides on the API & engineering half (effort dials,
+  streaming, token billing, multi-turn state, tool use, structured output, caching, latency, pitfalls, a
+  production checklist), grounded in OpenAI/Anthropic docs
 
 Open `presentation.html` directly in a browser to present.
 
@@ -79,8 +100,8 @@ Open `presentation.html` directly in a browser to present.
 
 ### Prerequisites
 
-- OpenAI API key (required — used by the notebooks and demo apps)
-- Anthropic / Google / DeepSeek API keys (optional — the model bake-off notebooks `04` and `05` use whichever keys are present; `05` also runs fully in mock mode with no keys)
+- OpenAI API key (required — used by the demo apps and the live path of the provider deep-dives)
+- Anthropic / Google / DeepSeek API keys (optional — `02_reproducibility_cheap_vs_flagship` uses whichever keys are present and otherwise runs fully in mock mode with no keys; the from-scratch pipeline notebook `01` needs no keys at all)
 - Python 3.11 or higher (for local setup only)
 
 ### Option 1: GitHub Codespaces (Recommended)
@@ -96,7 +117,7 @@ GitHub Codespaces provides a ready-to-use development environment in your browse
 
 #### Step 2: Set Up Your API Keys
 
-You'll need an OpenAI API key to run the core notebooks and demo apps. Anthropic / Google / DeepSeek keys are optional — the bake-off notebooks `04` and `05` use whichever are present. Choose one of the following options:
+The from-scratch pipeline notebook `01` runs with no keys. An OpenAI key powers the demo apps and the live path of `02` / the provider deep-dives; Anthropic / Google / DeepSeek keys are optional (`02` uses whichever are present and otherwise runs in mock mode). Choose one of the following options:
 
 **Option A: GitHub Secrets (Recommended)**
 
