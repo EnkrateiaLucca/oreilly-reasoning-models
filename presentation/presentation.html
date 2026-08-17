@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Reasoning LLMs: From First Principles to the R1 Recipe</title>
+    <title>Reasoning LLMs: Foundations, the R1 Paper, and Working with Them</title>
     <meta charset="utf-8">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
@@ -27,6 +27,9 @@
         color: #2A2825;
         overflow: hidden;
       }
+      .box { background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 8px; }
+      .src { text-align: center; color: #5C5750; margin-top: 8px; font-size: 13px; }
+      table { border-collapse: collapse; }
     </style>
   </head>
   <body>
@@ -34,7 +37,7 @@
 class: center, middle
 
 # Reasoning LLMs
-## From First Principles to a From-Scratch R1 Recipe
+## Foundations · the DeepSeek R1 Paper · Working with Them
 
 Lucas Soares · O'Reilly Live Training
 
@@ -42,15 +45,18 @@ Lucas Soares · O'Reilly Live Training
 
 # Agenda
 
-**1. Intro to Reasoning LLMs** — what they are, why now
+**1. Foundations** — what reasoning LLMs are, the 2026 landscape, when & how to use them
 
 --
 
-**2. The DeepSeek R1 Paper** — reading the recipe
+**2. The DeepSeek R1 Paper** — an interactive walkthrough, and we rebuild it in code
 
 --
 
-**3. The R1 Recipe in Code** — five stages, three notebooks
+**3. Working with Reasoning Models** — the practical API & engineering half
+
+???
+Three movements: the idea, the training recipe (paper + from-scratch notebook), and the day-job of shipping these models.
 
 ---
 
@@ -58,14 +64,13 @@ class: center, middle
 
 <div style="font-size: 4em; color: #ddd; font-family: 'IBM Plex Sans';">01</div>
 
-# Intro to Reasoning LLMs
+# Foundations
 
-*What they are, why now*
+*What they are, the landscape, when & how to use them*
 
 ???
-This module is visual-first. Most slides are one image + one line — narrate the rest.
-The arc: what is reasoning → seeing it in the wild → where models rank → why/when to use → how to prompt → limits.
-Assets live in presentation/assets/. Swap thinking_in_the_wild.png for real product screenshots if you have them.
+Visual-first. Most slides are one image + one line — narrate the rest.
+Arc: what is reasoning → seeing it in the wild → the landscape → when to use → how to prompt.
 
 ---
 
@@ -100,118 +105,69 @@ The output contract changes: <strong>Output = reasoning chain + answer.</strong>
 
 ---
 
-## You've already seen these everywhere
+## You've already seen this — for real
 
-<img src="assets/thinking_in_the_wild.png" style="max-height: 370px; max-width: 92%; display: block; margin: 0 auto;">
+<img src="assets/chatgpt_thinking_real.png" style="max-height: 400px; max-width: 78%; display: block; margin: 0 auto; border: 2px solid #000000;">
 
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 8px; text-align: center;">
-The <strong>"Thinking…"</strong> tag is the tell — ChatGPT, Claude, Gemini, DeepSeek all show it.
-</div>
+<p class="src">A real ChatGPT answer: it <strong>"Thought for 1m 31s"</strong> before writing a word. The thinking pill is the tell — ChatGPT, Claude, Gemini, DeepSeek all show it.</p>
 
 ???
-Like the Stanford lecture's montage: thought summaries / <think> traces all over modern UIs.
-Drop in your own real screenshots here if you'd like.
-
----
-
-## A catch: you pay for the thoughts
-
-Reasoning tokens are **billed as output tokens** — on every major API.
-
-- UIs show a *summarized* thought, not the raw chain (barely-readable, and exposed chains could train rivals)
-- So there's a real incentive to get **the most reasoning per token**
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-More on controlling the thinking budget later.
-</div>
+This is an actual product screenshot, not a diagram. Click the "Thought for 1m 31s" pill live in class if you have a session — the model deliberates, then answers.
+The raw chain is summarized in the UI (barely-readable, and exposed chains could train rivals).
 
 ---
 
 ## How we got here
 
-<img src="assets/timeline_2026.png" style="max-height: 370px; max-width: 92%; display: block; margin: 0 auto;">
+<img src="assets/timeline_2026.png" style="max-height: 380px; max-width: 96%; display: block; margin: 0 auto;">
 
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 8px; text-align: center;">
-o1-preview kicked it off (Sep 2024). DeepSeek-R1 (Jan 2025) made the <strong>recipe public</strong>.
+<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 12px; margin-top: 4px; text-align: center;">
+o1-preview kicked it off (Sep 2024). DeepSeek-R1 (Jan 2025) made the <strong>recipe public</strong>. By 2026 every flagship reasons.
 </div>
 
 ---
 
 ## Where the models rank today
 
-<img src="assets/leaderboard_intelligence.png" style="max-height: 360px; max-width: 88%; display: block; margin: 0 auto;">
+<img src="assets/aa_intelligence_index.png" style="max-height: 330px; max-width: 96%; display: block; margin: 0 auto; border: 2px solid #000000; background: #fff;">
 
-<p style="text-align: center; color: #5C5750; margin-top: 8px;">Demand concentrates on a handful of top labs. <em>(Artificial Analysis, ~Aug 2026, Intelligence Index v4.1.)</em></p>
+<p class="src"><strong>Artificial Analysis Intelligence Index v4.1.1</strong> — the top of the board is a cluster of reasoning models (⚡ = reasoning). <em>Live: <a href="https://artificialanalysis.ai/models" style="color:#5C5750;">artificialanalysis.ai/models</a></em></p>
 
----
-
-## Closing the gap
-
-<img src="assets/open_vs_proprietary.png" style="max-height: 370px; max-width: 88%; display: block; margin: 0 auto;">
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 8px; text-align: center;">
-Open-weights reasoning models now trail the frontier by <strong>months, not years</strong>.
-</div>
+???
+Screenshot captured live from artificialanalysis.ai. The frontier is tightly packed — a few points separate the leaders.
 
 ---
 
-## Why reach for a reasoning model?
+## The gap is closing
 
-It earns its extra tokens when the task is a **derivation**, not a lookup:
+<img src="assets/aa_open_vs_proprietary.png" style="max-height: 330px; max-width: 96%; display: block; margin: 0 auto; border: 2px solid #000000; background: #fff;">
 
-- Decomposes hard, multi-constraint problems
-- Hallucinates less on problems it can *check itself* on
-- Gives you the **reasoning**, not just the verdict
+<p class="src"><span style="color:#000;">■ Proprietary</span> &nbsp; <span style="color:#1f4fd8;">■ open-weights</span> — open models (blue) now sit <strong>right among the proprietary leaders</strong>. Months behind, not years. <em>Source: artificialanalysis.ai</em></p>
+
+???
+Same Intelligence Index, colored by openness. Open-weights reasoning models (Kimi K3, DeepSeek V4, Qwen, GLM) are interleaved with the closed frontier.
 
 ---
 
 ## What actually matters when you pick one
 
-<img src="assets/choosing_criteria.png" style="max-height: 370px; max-width: 90%; display: block; margin: 0 auto;">
-
-<p style="text-align: center; color: #5C5750; margin-top: 8px;">Reasoning quality · price · built-in knowledge · speed · context window.</p>
-
----
-
-## Price is the other axis
-
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;">
-<div style="background: #FFFFFF; padding: 10px; border: 2px solid #000000; border-radius: 0px; text-align: center;">
-<h4 style="margin: 0 0 6px; color: #000000; font-size: 15px;">Claude Fable 5</h4>
-<p style="font-size: 20px; font-weight: 700; margin: 4px 0;">~$50</p>
-<p style="font-size: 11px; color: #5C5750; margin: 0;">priciest, no off-switch</p>
-</div>
-<div style="background: #FFFFFF; padding: 10px; border: 2px solid #000000; border-radius: 0px; text-align: center;">
-<h4 style="margin: 0 0 6px; color: #000000; font-size: 15px;">GPT-5.6 Sol</h4>
-<p style="font-size: 20px; font-weight: 700; margin: 4px 0;">~$30</p>
-<p style="font-size: 11px; color: #5C5750; margin: 0;">frontier</p>
-</div>
-<div style="background: #FFFFFF; padding: 10px; border: 2px solid #000000; border-radius: 0px; text-align: center;">
-<h4 style="margin: 0 0 6px; color: #000000; font-size: 15px;">Claude Opus 5</h4>
-<p style="font-size: 20px; font-weight: 700; margin: 4px 0;">~$25</p>
-<p style="font-size: 11px; color: #5C5750; margin: 0;">frontier</p>
-</div>
-<div style="background: #EEF5EC; padding: 10px; border: 2px solid #000000; border-radius: 0px; text-align: center;">
-<h4 style="margin: 0 0 6px; color: #000000; font-size: 15px;">Kimi K3</h4>
-<p style="font-size: 20px; font-weight: 700; margin: 4px 0;">~$15</p>
-<p style="font-size: 11px; color: #5C5750; margin: 0;">open-weight, ~1/3 Fable 5's cost</p>
-</div>
-<div style="background: #FFFFFF; padding: 10px; border: 2px solid #000000; border-radius: 0px; text-align: center;">
-<h4 style="margin: 0 0 6px; color: #000000; font-size: 15px;">Gemini 3.1 Pro</h4>
-<p style="font-size: 20px; font-weight: 700; margin: 4px 0;">~$12</p>
-<p style="font-size: 11px; color: #5C5750; margin: 0;">&nbsp;</p>
-</div>
-<div style="background: #EEF5EC; padding: 10px; border: 2px solid #000000; border-radius: 0px; text-align: center;">
-<h4 style="margin: 0 0 6px; color: #000000; font-size: 15px;">DeepSeek V4 Pro</h4>
-<p style="font-size: 20px; font-weight: 700; margin: 4px 0;">~$0.87</p>
-<p style="font-size: 11px; color: #5C5750; margin: 0;">capable open-weights, ~34× cheaper</p>
-</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin: 16px 0;">
+<div><strong>1 · Intelligence / reasoning quality</strong><br><span style="font-size:13px;color:#5C5750;">composite score — note it's agentic-weighted</span></div>
+<div style="background:#EEF5EC;padding:2px 8px;border:2px solid #000;"><strong>2 · Tool-use &amp; agentic ability</strong> <span style="font-size:12px;">NEW</span><br><span style="font-size:13px;color:#5C5750;">now the largest slice of "intelligence"</span></div>
+<div style="background:#EEF5EC;padding:2px 8px;border:2px solid #000;"><strong>3 · Reliability &amp; instruction-following</strong> <span style="font-size:12px;">NEW</span><br><span style="font-size:13px;color:#5C5750;">pass@1, low hallucination</span></div>
+<div><strong>4 · Cost — per <em>task</em>, not per token</strong><br><span style="font-size:13px;color:#5C5750;">reasoning emits far more billed tokens</span></div>
+<div><strong>5 · Speed — split in two</strong><br><span style="font-size:13px;color:#5C5750;">output tokens/sec vs latency (TTFT)</span></div>
+<div><strong>6 · Context window</strong><br><span style="font-size:13px;color:#5C5750;">RAG / long-document workloads</span></div>
 </div>
 
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 8px;">
-The expensive model isn't always the right call. <em>(Approx; we test this in notebook 05.)</em><br>
-<span style="font-size: 13px; color: #5C5750;">These prices will drift — for live numbers: <a href="https://artificialanalysis.ai/models/recommend" style="color: #5C5750;">artificialanalysis.ai/models/recommend</a></span>
+<div style="background: #FBEAE7; border: 2px solid #000000; padding: 10px; margin-top: 4px; font-size: 14px;">
+Updated from the old "quality · price · knowledge · speed · context" list: <strong>tool-use</strong> and <strong>reliability</strong> now dominate, and "built-in knowledge" folds into #1/#3 as retrieval becomes the default.
 </div>
+
+<p class="src">Adapted from the Artificial Analysis Intelligence Index methodology v4.1.1 (agentic 34% · coding 24% · sci-reasoning 24% · general 18%, scored pass@1). <a href="https://artificialanalysis.ai/methodology/intelligence-benchmarking" style="color:#5C5750;">source</a></p>
+
+???
+Research-backed update: the deck used to teach 5 axes. The live AA methodology is dominated by agentic (34%) + coding (24%), so tool-use is now the single biggest component and reliability (pass@1 + hallucination penalties) deserves its own line. Price should be measured per task.
 
 ---
 
@@ -219,15 +175,19 @@ The expensive model isn't always the right call. <em>(Approx; we test this in no
 
 <img src="assets/01_test_time_compute.png" style="max-height: 370px; max-width: 75%; display: block; margin: 0 auto;">
 
-<p style="text-align: center; color: #5C5750; margin-top: 8px;">Every generated token is another forward pass — reasoning tokens <strong>buy compute</strong> before the model commits.</p>
+<p class="src">Every generated token is another forward pass — reasoning tokens <strong>buy compute</strong> before the model commits.</p>
 
 ---
 
 ## The simplest version of the trick
 
-<img src="assets/cot_paper_fig1.png" style="max-height: 460px; max-width: 96%; display: block; margin: 0 auto;">
+<img src="assets/cot_paper_fig1.png" style="max-height: 430px; max-width: 92%; display: block; margin: 0 auto;">
 
-<p style="text-align: center; color: #5C5750; margin-top: 8px;">"Let's think step by step." Chain-of-thought, scaled up, <em>is</em> the core idea. <em>(after Wei et al., 2022)</em></p>
+<p class="src">Chain-of-thought: show the working, get the answer right. Scaled up, this <em>is</em> the core idea. <em>(after Wei et al., 2022 · arXiv:2201.11903)</em></p>
+
+???
+This is the Chain-of-Thought Prompting figure (Wei et al., 2022). Standard prompting answers directly and misses; CoT writes the intermediate steps and lands it.
+(The "let's think step by step" phrasing is from a *different* paper — Kojima et al., zero-shot reasoners — so we don't attribute it here.)
 
 ---
 
@@ -244,89 +204,115 @@ Extended chains and self-correction ("wait, that's wrong…") <strong>emerge fro
 
 ## When to use one — and when not to
 
-<img src="assets/when_to_use.png" style="max-height: 370px; max-width: 92%; display: block; margin: 0 auto;">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0;">
+<div style="background: #EEF5EC; padding: 14px; border: 2px solid #000000;">
+<h4 style="margin-top:0;color:#000;">Strong fit → reach for it</h4>
+<ul style="font-size:14px;margin:0;padding-left:18px;">
+<li>Ambiguous, multi-step problems</li>
+<li>Long / dense document analysis</li>
+<li>Agentic planning &amp; strategy</li>
+<li>Multi-file coding &amp; debugging</li>
+<li>Visual reasoning · LLM-as-judge · hard math</li>
+</ul>
+</div>
+<div style="background: #FBEAE7; padding: 14px; border: 2px solid #000000;">
+<h4 style="margin-top:0;color:#000;">Poor fit → use a plain model</h4>
+<ul style="font-size:14px;margin:0;padding-left:18px;">
+<li>Fact lookup &amp; retrieval</li>
+<li>Classification &amp; routing</li>
+<li>Format conversion</li>
+<li>Latency-sensitive UX</li>
+<li>Long-output generation (cost)</li>
+</ul>
+</div>
+</div>
 
-<p style="text-align: center; color: #5C5750; margin-top: 8px;">Great for hard, single-shot problems. Wasteful for cheap, high-volume extraction.</p>
+<div style="background: #FEF8E6; border: 2px solid #000000; padding: 10px; font-size: 14px;">
+Pattern: <strong>reasoning model plans, cheaper model executes.</strong> &nbsp;Default: <em>"when in doubt, respond directly"</em> — don't turn thinking on reflexively.
+</div>
+
+<p class="src">Synthesized from OpenAI, Anthropic &amp; Google reasoning guides. Hard cost/latency numbers: our reproducibility notebook.</p>
+
+???
+All three providers agree: reasoning trades speed + cost for accuracy. Match effort to task complexity rather than always maxing it.
 
 ---
 
-## How to prompt a reasoning model
+## How to prompt a reasoning model — 1/3: universal principles
 
-- Keep the prompt **short and direct** — don't hand-write the chain of thought for it
-- Frame it as an **expert generalist**; state the goal, not the steps
-- Give it **clear success/failure criteria** for what a good answer looks like
-- Tune **effort/budget** to the task instead of always maxing it
+- Keep it **short, direct, goal-oriented** — these models reward clarity, not verbosity
+- **Don't hand-write the reasoning** — say *"think thoroughly,"* not *"think step by step"*
+- State **success criteria + hard constraints** up front (role → goal → constraints)
+- Set depth with the **effort/thinking dial**, not with prompt padding
+- **Zero-shot first**; add a few structured examples only if needed
+
+<div style="background: #E8F1F9; border: 2px solid #000000; padding: 10px; margin-top: 12px; font-size: 14px;">
+The reasoning is now the model's job. Your job is a crisp brief.
+</div>
+
+<p class="src">OpenAI reasoning best-practices · Anthropic extended-thinking tips · Gemini 3 guide.</p>
 
 ???
-Over-prompting CoT can hurt models already trained to reason. See OpenAI/Anthropic prompting guides.
+"Think step by step" is redundant (OpenAI) and inferior to "think thoroughly" (Anthropic) for internally-reasoning models.
+
+---
+
+## How to prompt — 2/3: what a good prompt looks like
+
+<div style="display:grid; grid-template-columns: 0.85fr 1.15fr; gap:20px; margin-top:14px;">
+<div>
+<p style="font-weight:700;margin:0 0 8px;">The shape</p>
+<div style="background:#E8F1F9;border:2px solid #000;padding:14px;font-size:14px;line-height:1.9;">
+<strong>Role</strong> — who the model is<br>
+<strong>Goal</strong> — the outcome, not the steps<br>
+<strong>Constraints</strong> — hard rules &amp; scope<br>
+<strong>Success criteria</strong> — what "done" means
+</div>
+<p style="font-size:13px;color:#5C5750;margin-top:10px;">Direct · goal-first · zero-shot.<br>Set <em>depth</em> with the effort dial, not the prompt.</p>
+</div>
+<div>
+<p style="font-weight:700;margin:0 0 8px;">Applied</p>
+<div style="background:#FEF8E6;border:2px solid #000;padding:14px;font-family:'JetBrains Mono';font-size:12.5px;line-height:1.6;">
+<span style="color:#5B9BD5;"># role</span><br>
+You are a senior tax analyst.<br>
+<span style="color:#5B9BD5;"># goal</span><br>
+Find every deduction this 2024 US filing qualifies for.<br>
+<span style="color:#5B9BD5;"># constraints</span><br>
+- cite the IRS form + line for each<br>
+- flag anything ambiguous; don't guess<br>
+<span style="color:#5B9BD5;"># success</span><br>
+A table an accountant could file from.
+</div>
+</div>
+</div>
+
+<p class="src">Notice what's <em>absent</em>: no "think step by step", no hand-written reasoning — that's the model's job.</p>
+
+---
+
+## How to prompt — 3/3: anti-patterns
+
+<table style="width:100%; font-size:14.5px; border:2px solid #000; margin-top:8px;">
+<tr style="background:#000;color:#fff;"><th style="padding:8px;text-align:left;width:48%;">✗ &nbsp;Don't</th><th style="padding:8px;text-align:left;">✓ &nbsp;Do instead</th></tr>
+<tr><td style="padding:8px;border:1px solid #000;background:#FBEAE7;">Hand-write "think step by step"</td><td style="padding:8px;border:1px solid #000;background:#EEF5EC;">Let it reason — say "think thoroughly"</td></tr>
+<tr><td style="padding:8px;border:1px solid #000;background:#FBEAE7;">Contradict yourself ("detailed" + "concise")</td><td style="padding:8px;border:1px solid #000;background:#EEF5EC;">One clear directive; separate concerns</td></tr>
+<tr><td style="padding:8px;border:1px solid #000;background:#FBEAE7;">Lower Gemini 3's temperature to reason</td><td style="padding:8px;border:1px solid #000;background:#EEF5EC;">Keep temperature at 1.0</td></tr>
+<tr><td style="padding:8px;border:1px solid #000;background:#FBEAE7;">"Always double-check" on newest Opus</td><td style="padding:8px;border:1px solid #000;background:#EEF5EC;">Trust its self-verification; don't nag</td></tr>
+<tr><td style="padding:8px;border:1px solid #000;background:#FBEAE7;">Max effort on every simple task</td><td style="padding:8px;border:1px solid #000;background:#EEF5EC;">Match effort to task complexity</td></tr>
+</table>
+
+<p class="src">Each "don't" costs tokens, latency, or quality for no gain. (API params &amp; deprecated knobs → Section 3.)</p>
 
 ---
 
 ## You're not prompting a model — you're prompting an agent
 
-<img src="assets/agent_prompt_anatomy.png" style="max-height: 370px; max-width: 70%; display: block; margin: 0 auto;">
+<img src="assets/agent_prompt_anatomy.png" style="max-height: 350px; max-width: 68%; display: block; margin: 0 auto;">
 
-<p style="text-align: center; color: #5C5750; margin-top: 8px;">Goal · return format · context · tools · actions. Modern reasoning systems route and act.</p>
+<p class="src">Goal · return format · context · tools · actions. Modern reasoning systems route and act — this framing still holds. <em>(confirmed against 2026 provider agent guides)</em></p>
 
----
-
-## The effort knobs
-
-- **OpenAI:** `reasoning.effort = none / low / medium / high / xhigh / max`
-- **Anthropic:** `output_config.effort = low / medium / high / xhigh / max` (current models) — `thinking.budget_tokens` still on Haiku 4.5
-- **Google:** thinking config on the Gemini models
-- **Kimi K3 (Moonshot, open-weight):** `reasoning_effort = low / high / max`
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 12px; margin-top: 12px;">
-Same model, dial the depth to the task.<br>
-Hands-on: <code>notebooks/provider_openai_thinking_parameters.ipynb</code> · <code>notebooks/provider_anthropic_extended_thinking.ipynb</code>
-</div>
-
-<div style="background: #E8F1F9; border: 2px solid #000000; border-radius: 0px; padding: 12px; margin-top: 8px;">
-<strong>The frontier trend:</strong> Claude Fable 5 and Kimi K3 can't turn thinking off at all anymore — always-on, no disable switch — but the depth dial still works fully. The dial is becoming universal; the <em>off-switch</em> is disappearing.
-</div>
-
----
-
-## Limitations (keep them honest)
-
-- 5–50× more tokens → **cost & latency**
-- Early/open models: **language mixing**, sensitivity to few-shot
-- The visible "thought" is a summary — and **may not be faithful** <em>(Anthropic: "reasoning models don't always say what they think")</em>
-
----
-
-class: center, middle
-
-<h1>
-<span style="background-color: #7CB56B; color: #FFFFFF; padding: 8px 16px;">
-  DEMO — Scratchpad vs. direct answer
-</span>
-</h1>
-
-<p style="margin-top: 16px; font-size: 15px; color: #5C5750;"><code>notebooks/01_foundations_reasoning_and_cot.ipynb</code></p>
-
-<p style="margin-top: 16px; font-size: 18px;">A tiny model learns that <strong>a scratchpad beats answering directly</strong> — the whole idea, measured, on your laptop.</p>
-
----
-
-## Recap
-
-- Reasoning ≠ retrieval — **output = reasoning + answer**
-
---
-
-- You can *see* it (the "Thinking…" tag) and you *pay* for it
-
---
-
-- Trade tokens for accuracy — only when the task needs it
-
---
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-Next: how DeepSeek <strong>trained</strong> one, then we <strong>rebuild</strong> it in code.
-</div>
+???
+Cross-checked: agentic framing is current best practice. All three providers document reasoning models as planners/agents; tool-use is the dominant Intelligence-Index component. Slide stays.
 
 ---
 
@@ -336,15 +322,47 @@ class: center, middle
 
 # The DeepSeek R1 Paper
 
-*Reading the paper — arxiv.org/pdf/2501.12948*
+*An interactive walkthrough — and we rebuild it in code*
+<p style="font-size: 15px; color: #5C5750; margin-top: 8px;">arxiv.org/pdf/2501.12948</p>
 
 ---
 
 ## Why this paper matters
 
 <div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 24px; margin-top: 24px; text-align: center; font-size: 20px;">
-Open weights + an open recipe for o1-level reasoning.
+Open weights + an <strong>open recipe</strong> for o1-level reasoning.
 </div>
+
+---
+
+class: center, middle
+
+<h1><span style="background-color: #7CB56B; color: #FFFFFF; padding: 8px 16px;">DEMO — two ways to train an LLM, overlaid</span></h1>
+
+<p style="margin-top: 16px; font-size: 15px; color: #5C5750;"><code>guide/training-overlay.html</code></p>
+
+<p style="margin-top: 16px; font-size: 18px;">Open the overlay: the <strong>same pretrained base</strong> → the paths diverge. <strong>Top:</strong> Llama-2 chat (RLHF + PPO). <strong>Bottom:</strong> DeepSeek-R1 (GRPO + verifiable rewards).</p>
+
+<p style="margin-top: 12px; font-size:14px; color:#5C5750;"><strong>Recap:</strong> the fork is at SFT (human QA vs long CoT); the deepest change is the <strong>reward</strong> — learned preference model + PPO critic <em>vs</em> rule-based verifiable rewards + GRPO with no critic.</p>
+
+???
+This overlay is the anchor for the whole section. Open the standalone HTML in a browser — it has a light/dark toggle and the full comparison table.
+
+---
+
+## Interactive walkthrough of the paper
+
+<div style="background: #E8F1F9; border: 2px solid #000000; border-radius: 0px; padding: 20px; margin-top: 16px;">
+<h3 style="margin-top:0;">📖 Open the guide → <code>guide/reasoning-training-guide.html</code></h3>
+<p style="font-size:15px;margin:8px 0 0;">A self-contained, interactive artifact that merges a <strong>pedagogical explanation</strong> with the <strong>paper itself</strong> — step through R1-Zero vs R1, the multi-stage pipeline, GRPO, and the embedded paper figures.</p>
+</div>
+
+The rest of this section walks the same pipeline — and we **rebuild each stage in code**.
+
+<p class="src">Notebook: <code>notebooks/01_build_a_reasoning_model_r1_from_scratch.ipynb</code> — one toy task (1-digit addition), one metric (pass-rate) climbing through every stage.</p>
+
+???
+Give students a few minutes to click through the interactive guide, then narrate the key concept slides that follow. The from-scratch notebook mirrors this section stage-for-stage.
 
 ---
 
@@ -382,7 +400,7 @@ A cheap, unhackable signal is what makes pure-RL reasoning possible.
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 32px 0;">
 <div style="background: #FBEAE7; padding: 16px; border: 2px solid #000000; border-radius: 0px;">
 <h4 style="margin-top: 0; color: #000000;">R1-Zero</h4>
-<p style="font-size: 15px; color: #2A2825;">Pure RL on a base model, no SFT. Works — but ugly outputs.</p>
+<p style="font-size: 15px; color: #2A2825;">Pure RL on a base model, no SFT. Works — but ugly, language-mixed outputs.</p>
 </div>
 <div style="background: #EEF5EC; padding: 16px; border: 2px solid #000000; border-radius: 0px;">
 <h4 style="margin-top: 0; color: #000000;">R1</h4>
@@ -394,25 +412,69 @@ A cheap, unhackable signal is what makes pure-RL reasoning possible.
 
 ## The "aha moment"
 
-<img src="assets/02_aha_moment.png" style="max-height: 460px; max-width: 88%; display: block; margin: 0 auto;">
+<img src="assets/02_aha_moment.png" style="max-height: 440px; max-width: 88%; display: block; margin: 0 auto;">
 
 ???
-Cropped from DeepSeek R1 paper (arxiv 2501.12948), Table 2.
+Cropped from DeepSeek R1 paper (arxiv 2501.12948), Table 2. Self-correction emerges from RL.
 
 ---
 
 ## Accuracy curve
 
-<img src="assets/02_aime_curve.png" style="max-height: 460px; max-width: 88%; display: block; margin: 0 auto;">
+<img src="assets/02_aime_curve.png" style="max-height: 440px; max-width: 88%; display: block; margin: 0 auto;">
 
 ???
 Cropped from DeepSeek R1 paper (arxiv 2501.12948), Figure 1.
 
 ---
 
+class: center, middle
+
+<h1><span style="background-color: #7CB56B; color: #FFFFFF; padding: 8px 16px;">DEMO — a scratchpad beats a direct answer</span></h1>
+
+<p style="margin-top: 16px; font-size: 15px; color: #5C5750;"><code>notebooks/01_build_a_reasoning_model_r1_from_scratch.ipynb</code> · §0 Foundations</p>
+
+<p style="margin-top: 16px; font-size: 18px;">Two tiny models on 1-digit addition — one answers <strong>directly</strong>, one gets a <strong>&lt;think&gt; scratchpad</strong>. The scratchpad wins, measured on your laptop.</p>
+
+<p style="margin-top: 12px; font-size:14px; color:#5C5750;"><strong>Recap:</strong> intermediate tokens aren't decoration — they're <em>computation</em>. That single result is why reasoning models exist.</p>
+
+---
+
 ## The 5-stage recipe
 
-<img src="assets/02_recipe_diagram.png" style="max-height: 360px; max-width: 92%; display: block; margin: 0 auto;">
+<div style="display: flex; justify-content: center; align-items: stretch; gap: 8px; margin: 44px 0 24px;">
+<div style="background:#FFFFFF;border:2px solid #000;padding:14px 8px;width:148px;text-align:center;">
+<div style="font-size:11px;color:#5C5750;letter-spacing:0.05em;">STAGE 1</div>
+<h4 style="margin:6px 0;color:#000;font-size:15px;">Pretrain</h4>
+<p style="font-size:11px;color:#5C5750;margin:0;">base model</p>
+</div>
+<div style="font-size:22px;color:#000;align-self:center;">&#8594;</div>
+<div style="background:#FBEAE7;border:2px solid #000;padding:14px 8px;width:148px;text-align:center;">
+<div style="font-size:11px;color:#5C5750;letter-spacing:0.05em;">STAGE 2</div>
+<h4 style="margin:6px 0;color:#000;font-size:15px;">Cold-start SFT</h4>
+<p style="font-size:11px;color:#5C5750;margin:0;">teach the format</p>
+</div>
+<div style="font-size:22px;color:#000;align-self:center;">&#8594;</div>
+<div style="background:#FEF8E6;border:2px solid #000;padding:14px 8px;width:148px;text-align:center;">
+<div style="font-size:11px;color:#5C5750;letter-spacing:0.05em;">STAGE 3</div>
+<h4 style="margin:6px 0;color:#000;font-size:15px;">RL · GRPO</h4>
+<p style="font-size:11px;color:#5C5750;margin:0;">reward correctness</p>
+</div>
+<div style="font-size:22px;color:#000;align-self:center;">&#8594;</div>
+<div style="background:#EEF5EC;border:2px solid #000;padding:14px 8px;width:148px;text-align:center;">
+<div style="font-size:11px;color:#5C5750;letter-spacing:0.05em;">STAGE 4</div>
+<h4 style="margin:6px 0;color:#000;font-size:14px;">Rejection-SFT</h4>
+<p style="font-size:11px;color:#5C5750;margin:0;">self-made data</p>
+</div>
+<div style="font-size:22px;color:#000;align-self:center;">&#8594;</div>
+<div style="background:#E8F1F9;border:2px solid #000;padding:14px 8px;width:148px;text-align:center;">
+<div style="font-size:11px;color:#5C5750;letter-spacing:0.05em;">STAGE 5</div>
+<h4 style="margin:6px 0;color:#000;font-size:15px;">Distillation</h4>
+<p style="font-size:11px;color:#5C5750;margin:0;">shrink the student</p>
+</div>
+</div>
+
+<div class="box" style="text-align:center;">Base → cold-start SFT → reasoning RL (GRPO) → rejection-sampling SFT → distillation. <strong>Our notebook runs all five on a toy task.</strong></div>
 
 ---
 
@@ -473,21 +535,21 @@ No value net. No human rater. The <strong>group is the baseline</strong>.
 </div>
 </div>
 
-<p style="text-align: center; color: #5C5750; margin-top: 8px;">Half the moving parts. No reward hacking from a learned critic.</p>
+<p class="src">Half the moving parts. No reward hacking from a learned critic.</p>
 
 ---
 
 ## GRPO in one picture
 
-<img src="assets/02_grpo_intuition.png" style="max-height: 360px; max-width: 88%; display: block; margin: 0 auto;">
+<img src="assets/02_grpo_intuition.png" style="max-height: 340px; max-width: 88%; display: block; margin: 0 auto;">
 
-<p style="text-align: center; color: #5C5750; margin-top: 8px;"><em>One prompt → G rollouts → rule-based rewards → z-score advantages.</em></p>
+<p class="src"><em>One prompt → G rollouts → rule-based rewards → z-score advantages.</em></p>
 
 ---
 
 ## The formal objective
 
-<img src="assets/02_grpo_objective.png" style="max-height: 380px; max-width: 88%; display: block; margin: 0 auto;">
+<img src="assets/02_grpo_objective.png" style="max-height: 360px; max-width: 88%; display: block; margin: 0 auto;">
 
 <div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 12px; margin-top: 8px; text-align: center; font-size: 15px;">
 Clipped PPO-style update — but the advantage <code>Â</code> is just the <strong>z-score of the group rewards</strong>. That's the whole trick.
@@ -498,137 +560,36 @@ Cropped from DeepSeek R1 paper (arxiv 2501.12948), §2.2.1 eqs (1)–(3).
 
 ---
 
-## Reward design
+class: center, middle
 
-- **Accuracy reward** — does the final answer match?
-- **Format reward** — did it use `<think>...</think>`?
+<h1><span style="background-color: #7CB56B; color: #FFFFFF; padding: 8px 16px;">DEMO — cold-start SFT → GRPO from scratch</span></h1>
 
-No learned reward model. Rule-based only.
+<p style="margin-top: 16px; font-size: 15px; color: #5C5750;"><code>01_build_a_reasoning_model_r1_from_scratch.ipynb</code> · §3 cold-start · §4 GRPO</p>
+
+<p style="margin-top: 16px; font-size: 18px;">Teach the <code>&lt;think&gt;…&lt;/think&gt;&lt;answer&gt;…&lt;/answer&gt;</code> format, then reward correctness. No critic, no value network, no human labels.</p>
+
+<p style="margin-top: 12px; font-size:14px; color:#5C5750;"><strong>Recap:</strong> cold-start locks the shape (answers still mostly wrong); GRPO makes the pass-rate <em>climb</em> — the group is the baseline.</p>
 
 ---
 
 ## Distillation results
 
-<img src="assets/02_distillation_table.png" style="max-height: 370px; max-width: 90%; display: block; margin: 0 auto;">
+<img src="assets/02_distillation_table.png" style="max-height: 360px; max-width: 90%; display: block; margin: 0 auto;">
 
 ???
-Cropped from DeepSeek R1 paper (arxiv 2501.12948), Table 15.
-
----
-
-## Limitations
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 24px; margin-top: 24px; text-align: center; font-size: 20px;">
-Language mixing, sensitivity to few-shot, weaker on general chat.
-</div>
+Cropped from DeepSeek R1 paper (arxiv 2501.12948), Table 15. A small dense student keeps most of the skill.
 
 ---
 
 class: center, middle
 
-<div style="font-size: 4em; color: #ddd; font-family: 'IBM Plex Sans';">03</div>
+<h1><span style="background-color: #7CB56B; color: #FFFFFF; padding: 8px 16px;">DEMO — amplify &amp; compress</span></h1>
 
-# The R1 Recipe in Code
+<p style="margin-top: 16px; font-size: 15px; color: #5C5750;"><code>01_build_a_reasoning_model_r1_from_scratch.ipynb</code> · §5 rejection-SFT · §6 distillation</p>
 
-*Five stages, three notebooks*
+<p style="margin-top: 16px; font-size: 18px;">Use the RL'd model as a <strong>data factory</strong> (generate → keep correct → fine-tune), then pour the skill into a <strong>~7× smaller student</strong>.</p>
 
-<p style="font-size: 16px; color: #5C5750; margin-top: 16px;">One toy task — 1-digit addition — runs through every stage.<br>We watch one number climb the whole way: the task pass-rate.</p>
-
----
-
-## The map: 5 stages → 3 notebooks
-
-<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 24px 0;">
-<div style="background: #FFFFFF; padding: 16px; border: 2px solid #000000; border-radius: 0px;">
-<div style="font-size: 1.6em; color: #E86B5A;">01</div>
-<h4 style="margin: 8px 0; color: #000000;">Foundations</h4>
-<p style="font-size: 13px; color: #5C5750; margin: 0 0 8px;">base model + why a scratchpad helps</p>
-<p style="font-size: 13px; color: #2A2825; margin: 0;">intermediate tokens <em>measurably</em> help</p>
-</div>
-<div style="background: #FFFFFF; padding: 16px; border: 2px solid #000000; border-radius: 0px;">
-<div style="font-size: 1.6em; color: #F5C542;">02</div>
-<h4 style="margin: 8px 0; color: #000000;">The RL core</h4>
-<p style="font-size: 13px; color: #5C5750; margin: 0 0 8px;">cold-start SFT → GRPO</p>
-<p style="font-size: 13px; color: #2A2825; margin: 0;">teach the format, then reward correctness</p>
-</div>
-<div style="background: #FFFFFF; padding: 16px; border: 2px solid #000000; border-radius: 0px;">
-<div style="font-size: 1.6em; color: #7CB56B;">03</div>
-<h4 style="margin: 8px 0; color: #000000;">Amplify & compress</h4>
-<p style="font-size: 13px; color: #5C5750; margin: 0 0 8px;">rejection-SFT → distillation</p>
-<p style="font-size: 13px; color: #2A2825; margin: 0;">self-improve, then shrink</p>
-</div>
-</div>
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 8px; text-align: center;">
-Each notebook runs top-to-bottom on a <strong>laptop CPU</strong> in minutes.
-</div>
-
----
-
-## Notebook 01 — Foundations
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-Every reasoning model starts as a plain <strong>next-token predictor</strong>.
-</div>
-
-Then the key experiment: train two tiny models on addition — one answers **directly**, one gets a **`<think>` scratchpad**.
-
-`notebooks/01_foundations_reasoning_and_cot.ipynb`
-
----
-
-## The insight that justifies the whole course
-
-The scratchpad model wins.
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-Intermediate tokens aren't decoration — they're <strong>computation</strong>.<br>
-That single result is <em>why</em> reasoning models exist.
-</div>
-
----
-
-## Notebook 02 — The RL core (1/2): Cold-start SFT
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-Teach the <strong>format</strong> first: <code>&lt;think&gt;…&lt;/think&gt;&lt;answer&gt;…&lt;/answer&gt;</code>.
-</div>
-
-A handful of examples locks in the shape — answers still mostly wrong. Pass-rate: low single digits. That's expected.
-
----
-
-## Notebook 02 — The RL core (2/2): GRPO
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-Sample the same prompt <strong>G times</strong>, score each by rule, push toward the group's best.
-</div>
-
-No critic. No value network. No human labels — **the group is the baseline**. Watch the pass-rate climb.
-
-`notebooks/02_rl_core_coldstart_sft_and_grpo.ipynb`
-
----
-
-## Notebook 03 — Amplify (1/2): Rejection-sampling SFT
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-Use the RL'd model as a <strong>data factory</strong>: generate → keep only correct → fine-tune.
-</div>
-
-The pass-rate jumps again with **no new training signal** — just better data.
-
----
-
-## Notebook 03 — Compress (2/2): Distillation
-
-<div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-Pour the skill into a <strong>smaller student</strong> with KL on the logits.
-</div>
-
-A model ~**1/7 the size** keeps most of the pass-rate.
-
-`notebooks/03_amplify_and_compress_rejection_sft_and_distillation.ipynb`
+<p style="margin-top: 12px; font-size:14px; color:#5C5750;"><strong>Recap:</strong> the pass-rate jumps again with no new training signal — just better data — and survives compression.</p>
 
 ---
 
@@ -648,22 +609,10 @@ A model ~**1/7 the size** keeps most of the pass-rate.
 </div>
 
 <div style="display: flex; gap: 12px; margin-top: 8px; padding-left: 52px;">
-<div style="flex: 1; text-align: center;">
-<h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">Cold-start</h4>
-<p style="font-size: 12px; color: #5C5750; margin: 0;">format</p>
-</div>
-<div style="flex: 1; text-align: center;">
-<h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">GRPO</h4>
-<p style="font-size: 12px; color: #5C5750; margin: 0;">skill</p>
-</div>
-<div style="flex: 1; text-align: center;">
-<h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">Reject-SFT</h4>
-<p style="font-size: 12px; color: #5C5750; margin: 0;">stability</p>
-</div>
-<div style="flex: 1; text-align: center;">
-<h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">Distill</h4>
-<p style="font-size: 12px; color: #5C5750; margin: 0;">efficiency (smaller)</p>
-</div>
+<div style="flex: 1; text-align: center;"><h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">Cold-start</h4><p style="font-size: 12px; color: #5C5750; margin: 0;">format</p></div>
+<div style="flex: 1; text-align: center;"><h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">GRPO</h4><p style="font-size: 12px; color: #5C5750; margin: 0;">skill</p></div>
+<div style="flex: 1; text-align: center;"><h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">Reject-SFT</h4><p style="font-size: 12px; color: #5C5750; margin: 0;">stability</p></div>
+<div style="flex: 1; text-align: center;"><h4 style="margin: 0 0 4px; color: #000000; font-size: 14px;">Distill</h4><p style="font-size: 12px; color: #5C5750; margin: 0;">efficiency (smaller)</p></div>
 </div>
 
 <p style="text-align: center; color: #5C5750; font-size: 13px; margin-top: 8px;"><em>(Exact numbers print live in the notebook — that's the demo.)</em></p>
@@ -680,20 +629,198 @@ Scaled up massively. <strong>Not replaced.</strong>
 
 ---
 
-## Bonus → picking & proving in practice
+class: center, middle
 
-- `notebooks/04_picking_a_reasoning_model_for_an_application.ipynb`
-  a multi-provider bake-off with an LLM judge
+<div style="font-size: 4em; color: #ddd; font-family: 'IBM Plex Sans';">03</div>
 
---
+# Working with Reasoning Models
 
-- `notebooks/05_reproducibility_cheap_vs_flagship.ipynb`
-  fix a **seed**, match a flagship with a **cheaper** model, count the cost
+*The practical API &amp; engineering half*
 
---
+<p style="font-size: 15px; color: #5C5750; margin-top: 12px;">One fact drives every decision: the model spends hidden tokens thinking before it answers.</p>
+
+???
+Ten slides of the day-job: parameters, code, and engineering decisions across OpenAI, Anthropic & Google. Grounded in current official docs.
+
+---
+
+## 1 · The depth dial — one idea, three knobs
+
+<table style="width:100%; font-size:13px; border:2px solid #000;">
+<tr style="background:#000;color:#fff;"><th style="padding:6px;">OpenAI</th><th style="padding:6px;">Anthropic</th><th style="padding:6px;">Google</th></tr>
+<tr><td style="padding:8px;border:1px solid #000;"><code>reasoning={"effort": ...}</code><br>none · low · medium · high · xhigh · max</td><td style="padding:8px;border:1px solid #000;"><code>thinking={"type":"adaptive"}</code><br>+ <code>output_config={"effort": ...}</code></td><td style="padding:8px;border:1px solid #000;"><code>thinking_level</code><br>minimal · low · medium · high</td></tr>
+</table>
+
+- Higher effort = more thinking tokens = better on hard tasks, slower + pricier; models scale **down** on easy inputs automatically
+- Anthropic separates *whether* it thinks (`thinking`) from *how hard* (`effort`) — don't confuse them
+- `budget_tokens` is **deprecated / 400** on newest Claude → use adaptive + effort
+- `max_tokens` is the only **hard** ceiling; effort/budget are soft guidance
+
+<p class="src">OpenAI reasoning guide · Anthropic thinking docs · Gemini thinking docs.</p>
+
+---
+
+## 2 · Streaming: visible vs summarized
+
+- You **never get the raw chain of thought** — only an opt-in *summary*
+- OpenAI `reasoning.summary` (auto/concise/detailed) · Anthropic `display` (summarized/omitted) · Gemini `thinking_summaries`
+- Streaming order is always: **thinking deltas → signature → answer text**
+- `display: "omitted"` cuts time-to-first-answer-token but **not** cost
+- Summaries come from a *separate* model; the answering model never sees them
+
+<div style="background:#E8F1F9;border:2px solid #000;padding:8px;margin-top:10px;font-family:'JetBrains Mono';font-size:13px;">
+content_block_delta(thinking_delta…) → signature_delta → content_block_delta(text_delta…)
+</div>
+
+---
+
+## 3 · Reasoning tokens are billed as output tokens
+
+The single most important cost fact — **hidden thinking still costs money.**
+
+- Read it: OpenAI `reasoning_tokens` · Anthropic `thinking_tokens` · Gemini `total_thought_tokens`
+- You pay for the **full** thinking even when you only see a short summary
+- Reserve headroom (OpenAI suggests **~25k**) or a truncated run bills you for thinking with **no answer**
+- Budget = f(effort level, task complexity) — **measure, then tune down**
+
+<div style="background: #FBEAE7; border: 2px solid #000000; padding: 10px; margin-top: 12px; font-size:14px;">
+A response that hits <code>max_output_tokens</code> mid-thought comes back <code>incomplete</code> — and you're still charged.
+</div>
+
+---
+
+## 4 · Multi-turn: carry the reasoning back
+
+Reasoning state does **not** follow the conversation automatically.
+
+- **Anthropic:** echo every `thinking` block back *unchanged* (incl. `redacted_thinking`) during tool use — edit/reorder/drop → **400**
+- **OpenAI:** `previous_response_id` (stateful) *or* replay `encrypted_content` (stateless/ZDR); `reasoning.context` picks scope
+- **Gemini:** resend `thought` signatures verbatim in stateless mode
+- Chat Completions drops reasoning items → prefer the **Responses API** for agentic loops
+
+<div style="background:#FEF8E6;border:2px solid #000;padding:8px;margin-top:10px;font-family:'JetBrains Mono';font-size:12px;">
+second = responses.create(model="gpt-5.6", previous_response_id=first.id, input="Now patch it.")
+</div>
+
+---
+
+## 5 · Tool use with reasoning
+
+- A tool loop is **one assistant turn**: model reasons → calls tools → answers
+- **Anthropic:** pick thinking mode per turn (can't toggle mid-turn); **forced tool choice needs *adaptive* thinking**
+- **Interleaved thinking** = reason *between* tool calls (adaptive = automatic; manual = beta header)
+- **OpenAI:** echo reasoning items + function-call items back every hop; mind the `phase` field
+- Production pattern: **reasoning model plans, cheap model executes**
+
+<div style="background:#EEF5EC;border:2px solid #000;padding:8px;margin-top:10px;font-size:13px;">
+thinking → tool → <strong>thinking</strong> → tool → answer &nbsp;(interleaved beats one-shot for long agentic runs)
+</div>
+
+---
+
+## 6 · Structured outputs / JSON
+
+- OpenAI Structured Outputs (`json_schema`, `strict: true`) **works** with reasoning models
+- Strict schema requires: all fields `required`, `additionalProperties: false`
+- Biggest break = **truncation**: thinking eats the budget, JSON stops mid-object → give it headroom
+- Anthropic path is **tool-use schemas** (Pydantic in this course); forced tool choice needs adaptive thinking
+- Keep schemas **byte-stable** so they stay in the prompt cache
+
+<div style="background:#FBEAE7;border:2px solid #000;padding:8px;margin-top:10px;font-size:13px;">
+Guard every structured call against <code>incomplete</code> / parse failure.
+</div>
+
+---
+
+## 7 · Prompt caching interactions
+
+Caching is where reasoning config quietly wrecks your hit rate.
+
+- Cache hits need **byte-identical prefixes**; OpenAI cached input ≈ **0.1×** cost
+- **Anthropic renders thinking config/effort into the prompt** → changing it **breaks the cache**
+- Lock **one** effort/budget per cached conversation; don't tune it mid-thread
+- During tool loops, thinking blocks cache *with* tool results (then bill as input on read)
+- Long reasoning runs outlive the 5-min cache → use the **1-hour TTL**
+
+---
+
+## 8 · Latency &amp; throughput
+
+- To go faster: **drop effort first** — it shrinks thinking + answer together
+- **Route by task:** reasoning model for hard/ambiguous, fast model for well-defined
+- Stream, and use `display:"omitted"` to start the answer sooner (cost unchanged)
+- Budgets > ~32k, or `max_tokens` > 21,333 → **stream and/or batch** to dodge timeouts
+- Parallelize independent calls; spend high effort only where it pays
+
+<p class="src">Latency ↔ effort is measurable — see the reproducibility notebook.</p>
+
+---
+
+## 9 · Common pitfalls (the 400 club)
+
+<ul style="font-size:15px; line-height:1.7;">
+<li><strong>Truncation</strong> is #1 — thinking exhausts the budget → incomplete output, still billed</li>
+<li>Newest Claude **rejects custom `temperature`/`top_p`/`top_k`** and any response **prefill**</li>
+<li>Never **edit, reorder, or drop** thinking blocks (incl. `redacted_thinking`) → 400</li>
+<li>Don't say <em>"think step by step"</em> — over-prompting CoT hurts; be direct &amp; zero-shot</li>
+<li>OpenAI: **developer** (not system) messages; Anthropic: migrate off `budget_tokens`</li>
+</ul>
+
+---
+
+## 10 · Production pre-flight checklist
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;font-size:14px;margin-top:10px;">
+<div>☐ Right tool for the task?</div>
+<div>☐ Effort chosen &amp; **pinned**?</div>
+<div>☐ Token headroom reserved (~25k)?</div>
+<div>☐ Cost instrumented (log reasoning tokens)?</div>
+<div>☐ State handling correct per provider?</div>
+<div>☐ Tool-loop mode set per turn?</div>
+<div>☐ Streaming + timeout strategy?</div>
+<div>☐ Cache byte-stable, config fixed?</div>
+<div>☐ Structured output guarded vs truncation?</div>
+<div>☐ Prompts direct, zero-shot, no CoT padding?</div>
+</div>
+
+<div style="background: #FEF8E6; border: 2px solid #000000; padding: 10px; margin-top: 14px; font-size:14px;">
+Model choice → effort pinned → headroom → cost logged → state echoed → cache stable.
+</div>
+
+---
+
+class: center, middle
+
+<h1><span style="background-color: #7CB56B; color: #FFFFFF; padding: 8px 16px;">DEMO — provider reasoning controls, hands-on</span></h1>
+
+<p style="margin-top: 16px; font-size: 15px; color: #5C5750;"><code>provider_openai_thinking_parameters.ipynb</code> · <code>provider_anthropic_extended_thinking.ipynb</code></p>
+
+<p style="margin-top: 16px; font-size: 18px;">Dial <code>reasoning.effort</code> across levels; drive Claude adaptive/extended thinking. Watch tokens, latency, and answer quality move together.</p>
+
+<p style="margin-top: 12px; font-size:14px; color:#5C5750;"><strong>Recap:</strong> same model, dial the depth to the task — the knob is now universal; the off-switch is disappearing.</p>
+
+---
+
+class: center, middle
+
+<h1><span style="background-color: #7CB56B; color: #FFFFFF; padding: 8px 16px;">DEMO — cheap vs flagship, reproducibly</span></h1>
+
+<p style="margin-top: 16px; font-size: 15px; color: #5C5750;"><code>notebooks/02_reproducibility_cheap_vs_flagship.ipynb</code></p>
+
+<p style="margin-top: 16px; font-size: 18px;">Fix a **seed**, match a flagship with a **cheaper** model, and **count the cost** — the engineering half of "which model do I ship?"</p>
+
+<p style="margin-top: 12px; font-size:14px; color:#5C5750;"><strong>Recap:</strong> the expensive model isn't always the right call — measure per-task cost, not per-token price.</p>
+
+---
+
+## Recap — the three movements
+
+- **Foundations** — output = reasoning + answer; reach for it on hard, ambiguous, agentic work
+- **The R1 paper** — cold-start SFT → GRPO on verifiable rewards → reject-SFT → distill; we rebuilt it
+- **Working with them** — pin effort, budget for hidden tokens, echo reasoning state, guard truncation
 
 <div style="background: #FEF8E6; border: 2px solid #000000; border-radius: 0px; padding: 16px; margin-top: 16px;">
-The training story, then the <strong>engineering</strong> story.
+The recipe is public and the knobs are in your hands. Now go ship one.
 </div>
 
 ---
@@ -702,9 +829,9 @@ class: center, middle
 
 # Questions?
 
-<p style="color: #5C5750; margin-top: 16px;">DeepSeek R1 paper — arxiv.org/pdf/2501.12948</p>
-<p style="color: #5C5750;">Notebooks: <code>01_foundations_reasoning_and_cot</code> → <code>05_reproducibility_cheap_vs_flagship</code></p>
-<p style="color: #5C5750;">Current model rankings/pricing: artificialanalysis.ai/models/recommend</p>
+<p style="color: #5C5750; margin-top: 16px;">DeepSeek R1 paper — arxiv.org/pdf/2501.12948 · interactive guide: <code>guide/reasoning-training-guide.html</code></p>
+<p style="color: #5C5750;">Notebooks: <code>01_build_a_reasoning_model_r1_from_scratch</code> · <code>02_reproducibility_cheap_vs_flagship</code> · provider deep-dives</p>
+<p style="color: #5C5750;">Current model rankings/pricing: artificialanalysis.ai/models</p>
 
 Lucas Soares · O'Reilly Live Training
 
