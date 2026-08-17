@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traditional vs. Reasoning LLM — Two Training Pipelines, Overlaid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root{
+  --paper:#F5F3EB; --ink:#2A2825; --head:#000000; --box:#FFFFFF; --line:#000000;
+  --muted:#6E6A5E; --hair:#CFC9B8;
+  --red:#E86B5A;    --red-bg:#FBEAE7;
+  --yellow:#F5C542; --yellow-bg:#FEF8E6;
+  --green:#7CB56B;  --green-bg:#EEF5EC;
+  --blue:#5B9BD5;   --blue-bg:#E8F1F9;
+  --sans:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#1A1914; --ink:#E9E5D7; --head:#FFFFFF; --box:#242219; --line:#E9E5D7;
+    --muted:#A49C88; --hair:#3A382E;
+    --red:#F08877;    --red-bg:#3A231E;
+    --yellow:#F5C542; --yellow-bg:#3A3320;
+    --green:#8FC77C;  --green-bg:#213221;
+    --blue:#7FB4E6;   --blue-bg:#1E2E3D;
+  }
+}
+:root[data-theme="light"]{
+  --paper:#F5F3EB; --ink:#2A2825; --head:#000; --box:#FFF; --line:#000; --muted:#6E6A5E; --hair:#CFC9B8;
+  --red:#E86B5A;--red-bg:#FBEAE7;--yellow:#F5C542;--yellow-bg:#FEF8E6;--green:#7CB56B;--green-bg:#EEF5EC;--blue:#5B9BD5;--blue-bg:#E8F1F9;
+}
+:root[data-theme="dark"]{
+  --paper:#1A1914; --ink:#E9E5D7; --head:#FFF; --box:#242219; --line:#E9E5D7; --muted:#A49C88; --hair:#3A382E;
+  --red:#F08877;--red-bg:#3A231E;--yellow:#F5C542;--yellow-bg:#3A3320;--green:#8FC77C;--green-bg:#213221;--blue:#7FB4E6;--blue-bg:#1E2E3D;
+}
+
+/* ================= RESET ================= */
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  line-height:1.45;-webkit-font-smoothing:antialiased;font-size:15px}
+h1,h2,h3,h4{margin:0;color:var(--head);font-weight:700;line-height:1.1;letter-spacing:-.01em}
+p{margin:0}
+.mono{font-family:var(--mono)}
+
+/* ================= SHELL ================= */
+.wrap{max-width:1520px;margin:0 auto;padding:34px 34px 46px}
+.masthead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+  border-bottom:3px solid var(--line);padding-bottom:18px;margin-bottom:26px}
+.masthead h1{font-size:30px;max-width:26ch}
+.masthead .sub{color:var(--muted);font-size:15px;margin-top:8px;max-width:60ch}
+.themebtn{border:2px solid var(--line);background:var(--box);color:var(--ink);font-family:var(--mono);
+  font-size:12px;padding:6px 11px;cursor:pointer}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:13px;height:13px;border:2px solid var(--line);display:inline-block}
+
+/* ================= PIPELINE GRID ================= */
+.pipe{display:grid;
+  grid-template-columns:minmax(150px,.92fr) 56px minmax(150px,1.02fr) 30px minmax(180px,1.3fr) 30px minmax(165px,1.16fr) 30px minmax(150px,1.04fr);
+  align-items:stretch;column-gap:0;row-gap:0}
+
+/* box base */
+.box{background:var(--box);border:2px solid var(--line);padding:12px 13px;position:relative;display:flex;
+  flex-direction:column;gap:6px;min-height:100%}
+.box .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.box h3{font-size:15.5px}
+.box p{font-size:13px;color:var(--ink)}
+.box .accentbar{position:absolute;left:0;top:0;bottom:0;width:6px}
+.box.pad-l{padding-left:19px}
+
+/* chips */
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 7px;border:1.5px solid var(--line);
+  line-height:1.3;margin-top:2px}
+.chip.red{background:var(--red-bg)} .chip.green{background:var(--green-bg)}
+.chip.blue{background:var(--blue-bg)} .chip.yellow{background:var(--yellow-bg)}
+.chip.no{background:var(--red-bg);font-weight:700}
+.chip.no::before{content:"✕ ";color:var(--red);font-weight:700}
+.emergent{margin-top:auto;padding:7px 9px;border:2px solid var(--line);background:var(--green-bg);
+  font-size:12px;font-weight:600}
+.emergent .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;font-weight:700;margin-bottom:2px}
+
+/* stage header labels */
+.stagehdr{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--head);font-weight:700;padding:0 2px 10px;text-align:center;align-self:end}
+.stagehdr small{display:block;color:var(--muted);font-weight:500;letter-spacing:.03em;text-transform:none;font-size:10.5px;margin-top:2px}
+
+/* track title bars */
+.trackbar{border:2px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:10px;margin:14px 0 8px;font-weight:700}
+.trackbar .num{font-family:var(--mono);font-size:12px;border:2px solid var(--line);background:var(--box);padding:2px 8px}
+.trackbar .src{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:500}
+.trackbar.trad{background:var(--blue-bg)}
+.trackbar.reason{background:var(--red-bg)}
+
+/* horizontal connector arrow (between boxes) */
+.har{position:relative;height:2px;background:var(--line);align-self:center;margin:0 5px;min-width:20px}
+.har::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  border-left:9px solid var(--line);border-top:6px solid transparent;border-bottom:6px solid transparent}
+
+/* shared pretraining block */
+.pretrain{grid-column:1;grid-row:2 / 8;align-self:stretch}
+.pretrain .box{height:100%;justify-content:center;background:var(--yellow-bg)}
+.stamp{align-self:flex-start;font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.12em;
+  border:2px solid var(--line);padding:3px 9px;background:var(--box);transform:rotate(-3deg);margin-top:4px}
+.modelchip{font-family:var(--mono);font-size:11px;border:1.5px solid var(--line);background:var(--box);padding:3px 7px;display:inline-block;margin-top:2px}
+
+/* fork bus */
+.fork{grid-column:2;grid-row:3 / 8;position:relative}
+.fork .stub{position:absolute;left:0;top:50%;width:52%;border-top:2px solid var(--line)}
+.fork .v{position:absolute;left:52%;top:9%;bottom:9%;border-left:2px solid var(--line)}
+.fork .a{position:absolute;left:52%;right:2px;border-top:2px solid var(--line)}
+.fork .a.top{top:9%}.fork .a.bot{bottom:9%}
+.fork .a::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  border-left:9px solid var(--line);border-top:6px solid transparent;border-bottom:6px solid transparent}
+.fork .lbl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);
+  transform-origin:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;background:var(--paper);padding:2px 4px}
+
+/* diff band */
+.diffwrap{grid-column:3 / 10;grid-row:5;position:relative;margin:6px 0}
+.diffgrid{display:grid;grid-template-columns:minmax(150px,1.02fr) 30px minmax(180px,1.3fr) 30px minmax(165px,1.16fr) 30px minmax(150px,1.04fr)}
+.diff{border:2px dashed var(--line);background:var(--yellow-bg);padding:8px 10px;font-size:12px;line-height:1.35}
+.diff .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);font-weight:700;display:block;margin-bottom:3px}
+.diff b{color:var(--head)}
+.diff .vs{font-family:var(--mono);font-weight:700;color:var(--red);padding:0 3px}
+
+/* distillation */
+.distill{grid-column:9;grid-row:8;margin-top:14px;position:relative}
+.distill .darrow{position:absolute;left:50%;top:-14px;height:14px;border-left:2px solid var(--line)}
+.distill .darrow::after{content:"";position:absolute;left:-5px;bottom:-1px;border-top:9px solid var(--line);
+  border-left:6px solid transparent;border-right:6px solid transparent}
+.distill .box{background:var(--blue-bg);border-style:dashed}
+
+/* ================= COMPARISON TABLE ================= */
+.tablewrap{margin-top:46px;overflow-x:auto}
+h2.secttl{font-size:18px;border-bottom:3px solid var(--line);padding-bottom:8px;margin-bottom:16px}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:13.5px}
+th,td{border:2px solid var(--line);padding:10px 13px;text-align:left;vertical-align:top}
+thead th{background:var(--head);color:var(--paper);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+thead th:first-child{background:var(--box);color:var(--head)}
+tbody th{background:var(--box);font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--head);width:16%;white-space:nowrap}
+td.trad{background:var(--blue-bg)} td.reason{background:var(--red-bg)}
+tbody tr:nth-child(odd) th{background:var(--paper)}
+td .same{font-family:var(--mono);font-weight:700;font-size:11px;color:var(--green);border:1.5px solid var(--line);background:var(--green-bg);padding:1px 6px}
+
+/* footer */
+.foot{margin-top:26px;border-top:2px solid var(--hair);padding-top:14px;font-family:var(--mono);
+  font-size:11.5px;color:var(--muted);line-height:1.7}
+.foot b{color:var(--ink)}
+
+/* ================= READING / LEARNING LAYER ================= */
+/* reading column for the prose + active-learning blocks (Pillar 1: ~68ch) */
+.readcol{max-width:70ch;margin:0 auto}
+
+/* reading-progress bar (Pillar 5) */
+#read-progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--head);z-index:1000}
+
+/* TL;DR / key-takeaways — its own distinct surface (Pillar 2 + primacy) */
+.tldr{border:2px solid var(--line);background:var(--box);padding:16px 18px;margin:0 0 26px;
+  box-shadow:5px 5px 0 var(--hair)}
+.tldr .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;display:block;margin-bottom:7px}
+.tldr h2{font-size:17px;margin-bottom:9px}
+.tldr ul{margin:0;padding-left:18px}
+.tldr li{margin:0 0 6px;font-size:14px;line-height:1.5}
+.tldr li:last-child{margin-bottom:0}
+.tldr .jump{margin-top:12px;padding-top:11px;border-top:1px solid var(--hair);font-family:var(--mono);
+  font-size:11.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.tldr .jump a{color:var(--head);text-decoration:none;border-bottom:1.5px solid var(--head)}
+
+/* section intro prose */
+.readcol p.lead{font-size:14.5px;line-height:1.6;color:var(--ink);margin:0 0 16px}
+
+/* retrieval prompt (Pillar 4 — g≈0.61) */
+.recall{border:2px solid var(--line);border-left:6px solid var(--green);background:var(--green-bg);margin:14px 0}
+.recall>summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:14px;list-style:none}
+.recall>summary::before{content:"↳ recall — ";font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:700}
+.recall>summary::-webkit-details-marker{display:none}
+.recall>summary:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.recall[open]>summary{border-bottom:2px solid var(--line)}
+.recall__answer{padding:11px 14px;font-size:13.5px;line-height:1.5}
+.recall__answer>:last-child{margin-bottom:0}
+.recall__answer code{font-family:var(--mono);font-size:12.5px}
+
+/* generation / self-explanation prompt (Pillar 4 — g≈0.40–0.56) */
+.generate{margin:16px 0;border:2px dashed var(--line);background:var(--yellow-bg);padding:13px 15px}
+.generate__prompt{font-size:14px;margin:0 0 4px}
+.generate__prompt .k{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;display:block;margin-bottom:4px}
+.generate__input{width:100%;box-sizing:border-box;margin:8px 0 4px;padding:9px 11px;font:inherit;font-size:13.5px;
+  border:2px solid var(--line);background:var(--box);color:var(--ink);resize:vertical}
+.generate .recall{background:var(--green-bg);margin-top:10px}
+
+/* self-check quiz (Pillar 4 — retrieval + light interleaving) */
+.quiz{border:2px solid var(--line);background:var(--box);padding:16px 18px;margin:22px 0}
+.quiz h3{font-size:15px;margin:0 0 12px}
+.quiz__q{border:0;margin:0 0 14px;padding:0}
+.quiz__q legend{font-weight:600;padding:0;margin-bottom:6px;font-size:13.5px}
+.quiz__q label{display:block;padding:3px 0;cursor:pointer;font-size:13.5px}
+.quiz__fb{margin:5px 0 0;font-family:var(--mono);font-size:11.5px;min-height:1.1em}
+.quiz__fb.ok{color:var(--green)} .quiz__fb.no{color:var(--red)}
+.quiz__check,.actionbtn{font:inherit;font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.03em;
+  padding:8px 14px;border:2px solid var(--line);cursor:pointer;background:var(--head);color:var(--paper)}
+.actionbtn{background:transparent;color:var(--head)}
+.quiz__score{font-family:var(--mono);font-weight:700;font-size:12.5px;margin-top:12px}
+
+/* review nudge (Pillar 4 — honest localStorage nudge, not enforcement) */
+#review-nudge{border:2px solid var(--line);border-left:6px solid var(--blue);background:var(--blue-bg);
+  padding:11px 14px;margin:0 0 20px;font-size:13.5px}
+#review-nudge a{color:var(--head);font-weight:700}
+
+.actionrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.actionrow .note{font-family:var(--mono);font-size:10.5px;color:var(--muted);line-height:1.5}
+
+/* recap (recency — restates the top takeaway at the bottom) */
+.recap{border:2px solid var(--line);background:var(--green-bg);padding:15px 18px;margin:8px 0 0}
+.recap .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;display:block;margin-bottom:7px}
+.recap p{font-size:14px;line-height:1.55}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{.themebtn,#read-progress,.actionrow,#review-nudge{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="read-progress" aria-hidden="true"></div>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <h1>Two Ways to Train an LLM — Overlaid</h1>
+      <p class="sub">The same pretrained base, then the paths diverge. <b>Top track:</b> a traditional chat model (Llama&nbsp;2). <b>Bottom track:</b> a reasoning model (DeepSeek-R1). Shared stages are aligned in columns so the differences are unmistakable.</p>
+      <div class="legend">
+        <span><i style="background:var(--yellow-bg)"></i> Shared stage</span>
+        <span><i style="background:var(--blue-bg)"></i> Traditional path</span>
+        <span><i style="background:var(--red-bg)"></i> Reasoning-only difference</span>
+        <span><i style="background:var(--green-bg)"></i> Emergent behavior</span>
+      </div>
+    </div>
+    <button class="themebtn" onclick="var r=document.documentElement;r.dataset.theme=(r.dataset.theme==='dark'?'light':'dark')">◐ theme</button>
+  </div>
+
+  <!-- ============ REVIEW NUDGE (return visits only) ============ -->
+  <div id="review-nudge" data-key="artifact:reasoning-vs-traditional-pipelines" hidden>
+    <span id="review-nudge-text"></span>
+    <a href="#selfcheck">Jump to the self-tests →</a>
+  </div>
+
+  <!-- ============ TL;DR — key takeaways in the first screenful (primacy) ============ -->
+  <div class="tldr">
+    <span class="eyebrow">Read this first · 30 seconds</span>
+    <h2>The one thing to remember</h2>
+    <ul>
+      <li><b>Same base model.</b> Both pipelines share Stage 0 (pretraining). The recipes only fork <b>after</b> that, at fine-tuning.</li>
+      <li><b>The deepest divergence is the reward.</b> Traditional LLMs <i>learn</i> a reward model from human preferences and optimize it with <b>PPO</b> (which needs a critic/value network). Reasoning models use <b>rule-based verifiable rewards</b> (accuracy + format) optimized with <b>GRPO</b> — no reward model, no critic; the <b>group-average reward is the baseline</b>.</li>
+      <li><b>Reasoning adds a self-improvement loop.</b> The model generates its own data, keeps only correct samples (rejection-sampling SFT), then runs a 2nd RL pass — which is where long chain-of-thought and self-verification (the "aha moment") <b>emerge</b>.</li>
+    </ul>
+    <div class="jump">
+      <span>On this page:</span>
+      <a href="#pipeline">The overlaid pipeline</a>
+      <a href="#table">Side-by-side table</a>
+      <a href="#selfcheck">Test yourself</a>
+    </div>
+  </div>
+
+  <!-- ============ PIPELINE ============ -->
+  <p class="readcol lead" id="pipeline" style="max-width:none;color:var(--muted);font-size:13px;font-family:var(--mono);margin-bottom:14px">
+    ↓ Read the diagram top-to-bottom: <b style="color:var(--head)">shared base</b> → the fork at SFT → each stage in aligned columns so the differences line up.
+  </p>
+  <div class="pipe">
+
+    <!-- stage header labels (row 1) -->
+    <div class="stagehdr" style="grid-column:1;grid-row:1">Stage 0<small>shared base</small></div>
+    <div class="stagehdr" style="grid-column:3;grid-row:1">① SFT<small>fine-tune on data</small></div>
+    <div class="stagehdr" style="grid-column:5;grid-row:1">② RL<small>reinforcement learning</small></div>
+    <div class="stagehdr" style="grid-column:7;grid-row:1">③ Refine<small>extra loops</small></div>
+    <div class="stagehdr" style="grid-column:9;grid-row:1">④ Result<small>shipped model</small></div>
+
+    <!-- shared pretraining (spans both tracks) -->
+    <div class="pretrain">
+      <div class="box">
+        <span class="cap">Stage 0 · identical for both</span>
+        <h3>Pretraining</h3>
+        <p>Internet-scale corpus. Self-supervised next-token prediction.</p>
+        <p style="color:var(--muted);font-size:12px">Yields a <b>base model</b> that produces real-sounding text but doesn't follow instructions.</p>
+        <span class="stamp">SAME BASE</span>
+        <span class="modelchip">Llama-2 base</span>
+        <span class="modelchip">DeepSeek-V3-Base</span>
+      </div>
+    </div>
+
+    <!-- fork bus -->
+    <div class="fork">
+      <div class="stub"></div><div class="v"></div>
+      <div class="a top"></div><div class="a bot"></div>
+      <span class="lbl">paths diverge</span>
+    </div>
+
+    <!-- TRACK 1 title bar -->
+    <div class="trackbar trad" style="grid-column:3 / 10;grid-row:2">
+      <span class="num">TOP</span> Traditional LLM &nbsp;→&nbsp; aligned chat model
+      <span class="src">source: Llama 2 · Touvron et al. 2023</span>
+    </div>
+
+    <!-- TRACK 1 boxes (row 3) -->
+    <div class="box pad-l" style="grid-column:3;grid-row:3">
+      <span class="accentbar" style="background:var(--blue)"></span>
+      <span class="cap">Supervised fine-tuning</span>
+      <h3>SFT</h3>
+      <p>Train on <b>human-annotated</b> instruction / question–answer pairs.</p>
+      <span class="chip blue">data: humans write the answers</span>
+    </div>
+    <div class="har" style="grid-column:4;grid-row:3"></div>
+    <div class="box pad-l" style="grid-column:5;grid-row:3">
+      <span class="accentbar" style="background:var(--blue)"></span>
+      <span class="cap">RLHF</span>
+      <h3>Learned reward + PPO</h3>
+      <p>Human preference data → <b>Safety Reward Model</b> + <b>Helpful Reward Model</b> → PPO.</p>
+      <span class="chip blue">learned reward models</span>
+      <span class="chip blue">PPO critic (value net) = baseline</span>
+    </div>
+    <div class="har" style="grid-column:6;grid-row:3"></div>
+    <div class="box" style="grid-column:7;grid-row:3;background:transparent;border-style:dashed;justify-content:center">
+      <p style="color:var(--muted);font-size:12px;text-align:center">No self-generated data loop —<br>go straight to release.</p>
+    </div>
+    <div class="har" style="grid-column:8;grid-row:3"></div>
+    <div class="box pad-l" style="grid-column:9;grid-row:3">
+      <span class="accentbar" style="background:var(--blue)"></span>
+      <span class="cap">Aligned chat model</span>
+      <h3>Llama-2-chat</h3>
+      <p>Helpful &amp; safe assistant.</p>
+      <div class="emergent"><span class="k">Emergent behavior</span>Follows instructions; helpful, safe replies.</div>
+    </div>
+
+    <!-- DIFF BAND (row 5) -->
+    <div class="diffwrap">
+      <div class="diffgrid">
+        <div class="diff" style="grid-column:1">
+          <span class="k">Key diff · SFT data</span>
+          <b>Human QA</b><span class="vs">vs</span><b>long Chain-of-Thought</b>
+        </div>
+        <div style="grid-column:2"></div>
+        <div class="diff" style="grid-column:3">
+          <span class="k">Key diff · reward</span>
+          <b>learned RMs + PPO critic</b><span class="vs">vs</span><b>rule-based verifiable + GRPO (no critic)</b>
+        </div>
+        <div style="grid-column:4"></div>
+        <div class="diff" style="grid-column:5">
+          <span class="k">Key diff · objective</span>
+          <b>alignment / helpfulness</b><span class="vs">vs</span><b>incentivize reasoning</b>
+        </div>
+        <div style="grid-column:6"></div>
+        <div class="diff" style="grid-column:7">
+          <span class="k">Key diff · emergent</span>
+          <b>instruction-following</b><span class="vs">vs</span><b>long CoT + self-verification</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACK 2 title bar -->
+    <div class="trackbar reason" style="grid-column:3 / 10;grid-row:6">
+      <span class="num">BOTTOM</span> Reasoning LLM &nbsp;→&nbsp; long-CoT reasoning model
+      <span class="src">source: DeepSeek-R1 · arXiv:2501.12948</span>
+    </div>
+
+    <!-- TRACK 2 boxes (row 7) -->
+    <div class="box pad-l" style="grid-column:3;grid-row:7">
+      <span class="accentbar" style="background:var(--red)"></span>
+      <span class="cap">Cold-start SFT</span>
+      <h3>Cold-start SFT</h3>
+      <p>Fine-tune on curated <b>long Chain-of-Thought</b> traces.</p>
+      <span class="chip red">data: <code style="font-family:var(--mono)">&lt;think&gt;…&lt;/think&gt;</code> reasoning</span>
+    </div>
+    <div class="har" style="grid-column:4;grid-row:7"></div>
+    <div class="box pad-l" style="grid-column:5;grid-row:7">
+      <span class="accentbar" style="background:var(--red)"></span>
+      <span class="cap">Reasoning-oriented RL</span>
+      <h3>GRPO</h3>
+      <p><b>Rule-based verifiable rewards:</b> accuracy + format + language-consistency.</p>
+      <span class="chip no">no learned reward model</span>
+      <span class="chip no">no value / critic network</span>
+      <span class="chip green">baseline = group average reward</span>
+    </div>
+    <div class="har" style="grid-column:6;grid-row:7"></div>
+    <div class="box pad-l" style="grid-column:7;grid-row:7">
+      <span class="accentbar" style="background:var(--red)"></span>
+      <span class="cap">Self-improve loop</span>
+      <h3>Rejection SFT → 2nd RL</h3>
+      <p>Model <b>generates its own data</b>, keep only correct samples; then a 2nd RL pass for all scenarios (helpful + harmless).</p>
+    </div>
+    <div class="har" style="grid-column:8;grid-row:7"></div>
+    <div class="box pad-l" style="grid-column:9;grid-row:7">
+      <span class="accentbar" style="background:var(--red)"></span>
+      <span class="cap">Reasoning model</span>
+      <h3>DeepSeek-R1</h3>
+      <p>Thinks before answering.</p>
+      <div class="emergent"><span class="k">Emergent behavior</span>Long CoT, self-verification, reflection — the "aha" moment.</div>
+    </div>
+
+    <!-- distillation offshoot -->
+    <div class="distill">
+      <div class="box">
+        <span class="darrow"></span>
+        <span class="cap">Optional</span>
+        <h3 style="font-size:14px">Distillation</h3>
+        <p style="font-size:12px">Transfer reasoning into smaller <b>dense students</b> (Qwen, Llama).</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ COMPARISON TABLE ============ -->
+  <div class="tablewrap" id="table">
+    <h2 class="secttl">Side-by-side: where the recipes differ</h2>
+    <table>
+      <thead>
+        <tr><th>Stage</th><th>Traditional LLM &nbsp;(Llama&nbsp;2)</th><th>Reasoning LLM &nbsp;(DeepSeek-R1)</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>Pretrain</th>
+          <td class="trad">Internet-scale, self-supervised <span class="same">SAME</span></td>
+          <td class="reason">Internet-scale, self-supervised <span class="same">SAME</span></td></tr>
+        <tr><th>SFT</th>
+          <td class="trad">Human-annotated instruction / QA pairs</td>
+          <td class="reason">Cold-start on long Chain-of-Thought traces</td></tr>
+        <tr><th>RL algorithm</th>
+          <td class="trad">PPO</td>
+          <td class="reason">GRPO</td></tr>
+        <tr><th>Reward source</th>
+          <td class="trad">Learned reward models (helpful + safety) from human preferences</td>
+          <td class="reason">Rule-based <b>verifiable</b> rewards: accuracy + format + language-consistency</td></tr>
+        <tr><th>Baseline / critic</th>
+          <td class="trad">Value network (critic) estimates the baseline</td>
+          <td class="reason">No critic — the <b>group average</b> reward is the baseline</td></tr>
+        <tr><th>Refine loop</th>
+          <td class="trad">— (ship after RLHF)</td>
+          <td class="reason">Rejection-sampling SFT on self-generated correct data → 2nd RL → optional distillation</td></tr>
+        <tr><th>Emergent behavior</th>
+          <td class="trad">Follows instructions; helpful &amp; safe</td>
+          <td class="reason">Long CoT, self-verification, reflection ("aha")</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ ACTIVE LEARNING: test yourself (Pillar 4) ============ -->
+  <div class="tablewrap readcol" id="selfcheck">
+    <h2 class="secttl">Test yourself — before you reread</h2>
+    <p class="lead">You just scanned a dense diagram, which feels like understanding but usually isn't (the "fluency illusion"). Try to <b>recall each answer first</b>, then open it. Struggling for a few seconds is what makes it stick — not rereading.</p>
+
+    <details class="recall">
+      <summary>Which stage is identical for both pipelines, and what does it produce?</summary>
+      <div class="recall__answer"><p><b>Stage 0 — pretraining</b> (internet-scale, self-supervised next-token prediction). It yields a <b>base model</b> that produces real-sounding text but does <i>not</i> follow instructions. Everything after this is where the two recipes diverge.</p></div>
+    </details>
+
+    <details class="recall">
+      <summary>At which stage do the two paths first fork, and what data does each use there?</summary>
+      <div class="recall__answer"><p>They fork at <b>SFT</b>. Traditional: <b>human-annotated</b> instruction / QA pairs (humans write the answers). Reasoning: <b>cold-start on long chain-of-thought traces</b> (<code>&lt;think&gt;…&lt;/think&gt;</code> reasoning).</p></div>
+    </details>
+
+    <details class="recall">
+      <summary>Why can GRPO drop the value/critic network that PPO requires?</summary>
+      <div class="recall__answer"><p>PPO needs a learned <b>value network</b> to estimate the baseline it subtracts from rewards. GRPO instead samples a <b>group</b> of outputs per prompt and uses the <b>group-average reward</b> as the baseline — so there's no separate critic to train.</p></div>
+    </details>
+
+    <details class="recall">
+      <summary>What makes DeepSeek-R1's RL rewards "verifiable," and why does it matter?</summary>
+      <div class="recall__answer"><p>They're <b>rule-based</b> — accuracy (is the answer correct?), format, and language-consistency — not a <i>learned</i> preference model. That means no reward model to train, and the signal is far harder to reward-hack. Contrast: Llama 2 trains <b>learned</b> Helpful + Safety reward models from human preference data.</p></div>
+    </details>
+
+    <details class="recall">
+      <summary>What is the self-improvement loop unique to the reasoning recipe?</summary>
+      <div class="recall__answer"><p><b>Rejection-sampling SFT:</b> the model generates its own data, keeps only the correct samples, and retrains on them — followed by a <b>2nd RL pass</b> covering all scenarios (helpful + harmless). Optionally, the reasoning is then <b>distilled</b> into smaller dense students (Qwen, Llama). The traditional recipe just ships after RLHF.</p></div>
+    </details>
+
+    <!-- generation / self-explanation prompt -->
+    <div class="generate">
+      <p class="generate__prompt"><span class="k">✍ Explain it first — then reveal</span>In your own words: the reasoning recipe removes <i>two</i> things PPO relies on. What are they, and what replaces each?</p>
+      <textarea class="generate__input" rows="3" placeholder="Write your explanation before revealing…" aria-label="Your explanation"></textarea>
+      <details class="recall">
+        <summary>Reveal model answer (compare against yours)</summary>
+        <div class="recall__answer"><p>It removes (1) the <b>learned reward model</b> — replaced by <b>rule-based verifiable rewards</b>; and (2) the <b>value/critic network</b> — replaced by the <b>group-average reward</b> as the baseline. A page can prompt you to generate this but can't grade it — check yours against this yourself.</p></div>
+      </details>
+    </div>
+
+    <!-- quick self-check quiz (interleaves early + late material) -->
+    <section class="quiz" aria-label="Self-check quiz">
+      <h3>Quick self-check</h3>
+      <fieldset class="quiz__q" data-answer="b">
+        <legend>1. The single deepest difference between the two recipes lives in the…</legend>
+        <label><input type="radio" name="q1" value="a"> pretraining corpus</label>
+        <label><input type="radio" name="q1" value="b"> reward mechanism</label>
+        <label><input type="radio" name="q1" value="c"> tokenizer</label>
+        <p class="quiz__fb" role="status"></p>
+      </fieldset>
+      <fieldset class="quiz__q" data-answer="c">
+        <legend>2. In GRPO, the baseline is…</legend>
+        <label><input type="radio" name="q2" value="a"> a learned value network</label>
+        <label><input type="radio" name="q2" value="b"> always zero</label>
+        <label><input type="radio" name="q2" value="c"> the group-average reward</label>
+        <p class="quiz__fb" role="status"></p>
+      </fieldset>
+      <fieldset class="quiz__q" data-answer="a">
+        <legend>3. "Cold-start SFT" in the reasoning pipeline trains on…</legend>
+        <label><input type="radio" name="q3" value="a"> curated long chain-of-thought traces</label>
+        <label><input type="radio" name="q3" value="b"> human-written QA pairs</label>
+        <label><input type="radio" name="q3" value="c"> raw internet text</label>
+        <p class="quiz__fb" role="status"></p>
+      </fieldset>
+      <button class="quiz__check" type="button">Check answers</button>
+      <p class="quiz__score" role="status" aria-live="polite"></p>
+    </section>
+
+    <div class="actionrow">
+      <button id="export-anki" class="actionbtn" type="button">⬇ Export these self-tests to Anki (.txt)</button>
+      <span class="note">Real retention needs spaced review across days — one page can't force that.<br>This hands the Q&amp;A above to Anki; a good cadence is day 1 / 3 / 7 / 21.</span>
+    </div>
+  </div>
+
+  <!-- ============ RECAP — restate the top takeaway (recency) ============ -->
+  <div class="tablewrap readcol">
+    <div class="recap">
+      <span class="eyebrow">Recap · the one thing</span>
+      <p><b>Same base, then a fork at SFT — and the deepest change is the reward.</b> Traditional: learned preference reward models + PPO (with a critic). Reasoning: rule-based verifiable rewards + GRPO (no reward model, no critic — group average is the baseline), plus a self-generated rejection-SFT → 2nd-RL loop from which long CoT and self-verification emerge.</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>Sources:</b> Traditional pipeline — Touvron et al., <i>Llama 2: Open Foundation and Fine-Tuned Chat Models</i> (2023). Reasoning pipeline — DeepSeek-AI, <i>DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</i> (arXiv:2501.12948).<br>
+    <b>Read it as:</b> Stage 0 is identical → the fork is at SFT → the deepest change is the reward (learned preference model + PPO critic&nbsp; vs&nbsp; rule-based verifiable rewards + GRPO with no critic).<br>
+    <b>How this page is built:</b> the self-tests and "explain first" prompts are deliberate friction — retrieval practice beats rereading for retention (Roediger &amp; Karpicke; Dunlosky et al. 2013). The page can prompt recall and export to spaced-repetition software, but it can't grade your explanations or enforce multi-day spacing.
+  </div>
+
+</div>
+
+<script>
+/* reading-progress bar */
+(function(){
+  var bar=document.getElementById('read-progress');
+  function update(){var h=document.documentElement,max=h.scrollHeight-h.clientHeight;
+    bar.style.width=(max>0?(h.scrollTop/max)*100:0)+'%';}
+  addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();
+})();
+
+/* self-check quiz scoring */
+document.querySelectorAll('.quiz').forEach(function(quiz){
+  quiz.querySelector('.quiz__check').addEventListener('click',function(){
+    var correct=0,total=0;
+    quiz.querySelectorAll('.quiz__q').forEach(function(q){
+      total++;
+      var chosen=q.querySelector('input:checked'),fb=q.querySelector('.quiz__fb');
+      if(!chosen){fb.textContent='Pick an answer.';fb.className='quiz__fb no';return;}
+      if(chosen.value===q.dataset.answer){correct++;fb.textContent='✓ Correct';fb.className='quiz__fb ok';}
+      else{fb.textContent='✗ Not quite — recall it before rereading.';fb.className='quiz__fb no';}
+    });
+    quiz.querySelector('.quiz__score').textContent='Score: '+correct+'/'+total;
+  });
+});
+
+/* export self-tests to Anki (Front<TAB>Back per line) */
+(function(){
+  var btn=document.getElementById('export-anki');if(!btn)return;
+  var clean=function(s){return (s||'').replace(/\s+/g,' ').trim();};
+  btn.addEventListener('click',function(){
+    var rows=[];
+    document.querySelectorAll('#selfcheck details.recall').forEach(function(d){
+      var q=clean(d.querySelector('summary')&&d.querySelector('summary').textContent)
+              .replace(/^(Reveal.*)/i,'').trim();
+      var a=clean(d.querySelector('.recall__answer')&&d.querySelector('.recall__answer').textContent);
+      if(q&&a&&!/^Reveal/i.test(q))rows.push(q.replace(/\t/g,' ')+'\t'+a.replace(/\t/g,' '));
+    });
+    if(!rows.length){return;}
+    var blob=new Blob([rows.join('\n')],{type:'text/plain'});
+    var url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='reasoning-vs-traditional-flashcards.txt';a.click();URL.revokeObjectURL(url);
+  });
+})();
+
+/* spaced-review nudge (return visits only — honest, can't enforce) */
+(function(){
+  var el=document.getElementById('review-nudge');if(!el)return;
+  var key=el.dataset.key||'artifact:default',last=null;
+  try{last=localStorage.getItem(key);}catch(e){return;}
+  var now=Date.now();
+  if(last){
+    var days=Math.floor((now-Number(last))/86400000);
+    if(days>=1){
+      document.getElementById('review-nudge-text').textContent=
+        'You last opened this '+days+' day'+(days===1?'':'s')+' ago — a quick self-test now beats rereading. ';
+      el.hidden=false;
+    }
+  }
+  try{localStorage.setItem(key,String(now));}catch(e){}
+})();
+</script>
+</body>
+</html>
